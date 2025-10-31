@@ -66,7 +66,7 @@ float tiempo_animacion = 0.0f; // Variable para animaciones automáticas
 
 
 // Vértices del cubo 
-//float vertices[] = {
+//float vertices_UV[] = {
 //
 //	// Posiciones           // Normales
 //	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -144,20 +144,20 @@ float vertices[] = {
 	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
 	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	 // Cara Inferior (-Y)
-	 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-	  0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-	  0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	  0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	 // Cara Inferior (-Y) *** MODIFICADA PARA REPETIR TEXTURA ***
+	 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 10.0f,
+	  0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  10.0f, 10.0f,
+	  0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  10.0f, 0.0f,
+	  0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  10.0f, 0.0f,
 	 -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-	 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-	 // Cara Superior (+Y)
-	 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-	  0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-	  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 10.0f,
+	 // Cara Superior (+Y) *** MODIFICADA PARA REPETIR TEXTURA ***
+	 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 10.0f,
+	  0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  10.0f, 10.0f,
+	  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  10.0f, 0.0f,
+	  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  10.0f, 0.0f,
 	 -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-	 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+	 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 10.0f
 };
 
 //glm::vec3 lampColors[] = {
@@ -196,7 +196,6 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 // (Variables globales... armColor, etc.)
 
-// Función para dibujar una parte del brazo con textura
 void pataDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID)
 {
 	// 1. Configurar la matriz del modelo para esta parte
@@ -287,16 +286,27 @@ int main()
 	// 						CARGA DE MODELOS 3D
 	// =================================================================================
 
-	Model Dog((char*)"Models/ball.obj");
+	/*Model Dog((char*)"Models/ball.obj");*/
 	Model Piso((char*)"Models/piso.obj");
-	Model Perro((char*)"Models/RedDog.obj");
+	/*Model Perro((char*)"Models/RedDog.obj");*/
 	Model Pinguino((char*)"Models/pinguino.obj");
 	Model Foca((char*)"Models/foca.obj");
+	Model Delfin((char*)"Models/delfin.obj");
 
 
 	// Carga textura
 	GLuint armTextureID = TextureFromFile("images/madera.jpg", ".");
 
+	// *** NUEVA TEXTURA PARA EL PISO ***
+	GLuint pisoTextureID = TextureFromFile("images/ladrillo.png", "."); // Cambia el nombre según tu textura
+	
+	// Configurar parámetros de repetición para la textura del piso
+	glBindTexture(GL_TEXTURE_2D, pisoTextureID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 
 	// =================================================================================
@@ -549,33 +559,40 @@ int main()
 		// ---------------------------------------------------------------------------------
 		// 
 
-		//Carga de modelo 
-		glm::mat4 model = glm::mat4(1.0f);
-		view = camera.GetViewMatrix();
-		model = glm::mat4(1);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso.Draw(lightingShader);
-
-		//modelo perro
-		glm::mat4 perro = glm::mat4(1.0f);
-
-		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(perro));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Perro.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		// *** DIBUJO DEL PISO USANDO CUBO PRIMITIVO ***
+		lightingShader.Use();
+		
+		// Activar y enlazar la textura del piso
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, pisoTextureID);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, pisoTextureID);
+		
+		// Enlazar el VAO del cubo
+		glBindVertexArray(VAO_Cubo);
+		
+		// Habilitar los atributos necesarios
+		glEnableVertexAttribArray(0); // Posición
+		glEnableVertexAttribArray(1); // Normal
+		glEnableVertexAttribArray(2); // TexCoords
+		
+		// Crear matriz de transformación para el piso (cubo muy plano y grande)
+		glm::mat4 model_piso = glm::mat4(1.0f);
+		model_piso = glm::translate(model_piso, glm::vec3(0.0f, -0.5f, 0.0f)); // Posición baja
+		model_piso = glm::scale(model_piso, glm::vec3(30.0f, 0.1f, 30.0f)); // Muy ancho y plano
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model_piso));
+		
+		// Dibujar el cubo (piso)
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
 		glBindVertexArray(0);
 
-		//modelo 
-		glm::mat4 pelota = glm::mat4(1.0f);
-		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pelota));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Dog.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
+		// Si quieres mantener también el modelo OBJ, descomenta estas líneas:
+		// glm::mat4 model = glm::mat4(1.0f);
+		// model = glm::scale(model, glm::vec3(1.0f, 1.0f, 10.0f));
+		// view = camera.GetViewMatrix();
+		// glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		// Piso.Draw(lightingShader);
 
 		//modelo pinguino
 		glm::mat4 pinguino = glm::mat4(1.0f);
@@ -602,11 +619,23 @@ int main()
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
+		//modelo delfin
+		glm::mat4 delfin = glm::mat4(1.0f);
+		delfin = glm::translate(delfin, glm::vec3(0.0f, 0.0f, 0.0f));
+		delfin = glm::rotate(delfin, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(delfin));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		Delfin.Draw(lightingShader);
+		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		glBindVertexArray(0);
+
 		/*lightingShader.Use();
 		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");*/
 
 		/*glUniform3f(objectColorLoc, 0.0f, 1.0f, 0.0f);*/
-		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(14.5f, -0.5f, 9.5f), modelLoc, VAO_Cubo, armTextureID);
+		/*pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(14.5f, -0.5f, 9.5f), modelLoc, VAO_Cubo, armTextureID);
 		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(-14.5f, -0.5f, 9.5f), modelLoc, VAO_Cubo, armTextureID);
 		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(-14.5f, -0.5f, -9.5f), modelLoc, VAO_Cubo, armTextureID);
 		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(14.5f, -0.5f, -9.5f), modelLoc, VAO_Cubo, armTextureID);
@@ -616,7 +645,7 @@ int main()
 		pataDraw(model, glm::vec3(0.2f, 4.0f, 48.0f), glm::vec3(200.0f, 0.41f, 0.0f), modelLoc, VAO_Cubo, armTextureID);//pared de enfrente
 		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(160.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de pinguino derecha
 		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(120.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de foca derecha
-		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(77.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de delfín derecha
+		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(77.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de delfín derecha*/
 
 
 
@@ -673,23 +702,10 @@ int main()
 		// Set matrices
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		model = glm::mat4(1);
+		glm::mat4 model = glm::mat4(1);
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//// Draw the light object (using light's vertex attributes)
-		//for (GLuint i = 0; i < 4; i++)
-		//{
-		//	model = glm::mat4(1);
-		//	model = glm::translate(model, pointLightPositions[i]);
-		//	model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//	glUniform3fv(lampColorLoc, 1, glm::value_ptr(lampColors[i]));
-		//	glBindVertexArray(VAO);
-		//	glDrawArrays(GL_TRIANGLES, 0, 36);
-		//}
-		//glBindVertexArray(0);
-
 
 
 		// Swap the screen buffers
