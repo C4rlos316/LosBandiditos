@@ -23,14 +23,22 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
-// =================================================================================
-// 	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
-// =================================================================================
+
 
 // Funciones prototipo para callbacks
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+
+
+// =================================================================================
+// 	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
+// =================================================================================
+//Configurar funciones para repetir textura de piso
+void ConfigurarTexturaRepetible(GLuint textureID);
+void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc);
+
+
 
 // Propiedades de la ventana
 const GLuint WIDTH = 1000, HEIGHT = 800;
@@ -38,7 +46,7 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 
 // Configuración de la cámara
-Camera  camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera  camera(glm::vec3(0.0f, 0.0f, 21.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 
@@ -57,9 +65,12 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(-2.0f, 0.2f, -2.0f)   // Esquina 4 (Negativo X, Negativo Z)
 };
 
-// ---------------------------------------------------------------------------------
-//VARIABLES PARA ANIMACIÓN Y MOVIMIENTO DE OBJETOS
-// ---------------------------------------------------------------------------------
+
+
+// =================================================================================
+// 						ANIMACIÓN Y POSICIONES BASE DE ANIMALES
+// =================================================================================
+
 float hombro_rot = 0.0f;
 float codo_rot = 0.0f;
 float tiempo_animacion = 0.0f; // Variable para animaciones automáticas
@@ -225,6 +236,8 @@ void pataDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint unif
 
 	// 6. Desvincular (buena práctica)
 	glBindVertexArray(0);
+
+
 }
 
 
@@ -283,30 +296,67 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
 	// =================================================================================
-	// 						CARGA DE MODELOS 3D
+	// 						CARGA DE MODELOS - Acuario (X,-Z)
 	// =================================================================================
 
-	/*Model Dog((char*)"Models/ball.obj");*/
 	Model Piso((char*)"Models/piso.obj");
-	/*Model Perro((char*)"Models/RedDog.obj");*/
 	Model Pinguino((char*)"Models/pinguino.obj");
 	Model Foca((char*)"Models/foca.obj");
 	Model Delfin((char*)"Models/delfin.obj");
 
-
 	// Carga textura
 	GLuint armTextureID = TextureFromFile("images/madera.jpg", ".");
 
-	// *** NUEVA TEXTURA PARA EL PISO ***
-	GLuint pisoTextureID = TextureFromFile("images/ladrillo.png", "."); // Cambia el nombre según tu textura
-	
-	// Configurar parámetros de repetición para la textura del piso
-	glBindTexture(GL_TEXTURE_2D, pisoTextureID);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// =================================================================================
+	// 						CARGA DE MODELOS - Selva (X,Z)
+	// =================================================================================
+
+
+
+
+	// =================================================================================
+	// 						CARGA DE MODELOS - DESIERTO (-X,Z)
+	// =================================================================================
+
+
+
+	// =================================================================================
+	// 						CARGA DE MODELOS - Sabana (-X,-Z)
+	// =================================================================================
+
+
+
+	// =================================================================================
+	// 						Carga de Texturas para los pisos
+	// =================================================================================
+
+
+	// PARA ESTA PARTE YA HAY UNA FUNCION LA CUAL ES ConfigurarTexturaRepetible para que la usen
+	// y no tengan que poner todo el codigo repetido ConfigurarTexturaRepetible(variablePiso);
+
+	// ***TEXTURA GENERAL PARA EL PISO ***
+	GLuint pisoTextureID = TextureFromFile("images/ladrillo.png", ".");
+	ConfigurarTexturaRepetible(pisoTextureID);
+
+	GLuint pisoEntradaID = TextureFromFile("images/pasto.jpg", ".");
+	ConfigurarTexturaRepetible(pisoEntradaID);
+
+	// *** TEXTURA PARA EL PISO ACUARIO ***
+	GLuint pisoAcuarioTextureID = TextureFromFile("images/acuario.jpg", ".");
+	ConfigurarTexturaRepetible(pisoAcuarioTextureID);
+
+	// *** TEXTURA PARA EL PISO SELVA ***
+	GLuint pisoSelvaTextureID = TextureFromFile("images/selva.jpg", ".");
+	ConfigurarTexturaRepetible(pisoSelvaTextureID);
+
+	// *** TEXTURA PARA EL PISO SABANA ***
+	GLuint pisoSabanaTextureID = TextureFromFile("images/sabana.jpg", ".");
+	ConfigurarTexturaRepetible(pisoSabanaTextureID);
+
+	// *** TEXTURA PARA EL PISO DESIERTO ***
+	GLuint pisoArenaTextureID = TextureFromFile("images/sand.jpg", ".");
+	ConfigurarTexturaRepetible(pisoArenaTextureID);
 
 
 	// =================================================================================
@@ -362,6 +412,34 @@ int main()
 	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0); // Desvincular el VAO
+
+
+	// =================================================================================
+	// 		CONFIGURACIÓN DE VÉRTICES PARA PISO DE ENTRADA
+	// =================================================================================
+	GLuint VBO_Entrada, VAO_Entrada;
+	glGenVertexArrays(1, &VAO_Entrada);
+	glGenBuffers(1, &VBO_Entrada);
+	glBindVertexArray(VAO_Entrada);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Entrada);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Atributo de Posición (Location 0)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Atributo de Normal (Location 1)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// Atributo de Coordenadas de Textura (Location 2)
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0); // Desvincular el VAO
+
+
 	// =================================================================================
 	// 								CICLO DE RENDERIZADO (GAME LOOP)
 	// =================================================================================
@@ -517,6 +595,9 @@ int main()
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 modelTemp = glm::mat4(1.0f);
+
 		// ---------------------------------------------------------------------------------
 		// 							CARGA DE TEXTURAS
 		// ---------------------------------------------------------------------------------
@@ -553,46 +634,32 @@ int main()
 		//cargarTextura("images/madera.jpg", texMadera);
 		//cargarTextura("images/madera.jpg", texMetal);
 		//cargarTextura("images/madera.jpg", texPlastico);
+		
 
 		// ---------------------------------------------------------------------------------
-		// 							DIBUJO DE MODELOS CARGADOS
+		// 							DIBUJO DE ESCENARIOS
 		// ---------------------------------------------------------------------------------
-		// 
 
-		// *** DIBUJO DEL PISO USANDO CUBO PRIMITIVO ***
+		// DIBUJO DEL PISO GENERAL LADRILLO
+
 		lightingShader.Use();
-		
-		// Activar y enlazar la textura del piso
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, pisoTextureID);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, pisoTextureID);
-		
-		// Enlazar el VAO del cubo
-		glBindVertexArray(VAO_Cubo);
-		
-		// Habilitar los atributos necesarios
-		glEnableVertexAttribArray(0); // Posición
-		glEnableVertexAttribArray(1); // Normal
-		glEnableVertexAttribArray(2); // TexCoords
-		
-		// Crear matriz de transformación para el piso (cubo muy plano y grande)
-		glm::mat4 model_piso = glm::mat4(1.0f);
-		model_piso = glm::translate(model_piso, glm::vec3(0.0f, -0.5f, 0.0f)); // Posición baja
-		model_piso = glm::scale(model_piso, glm::vec3(30.0f, 0.1f, 30.0f)); // Muy ancho y plano
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model_piso));
-		
-		// Dibujar el cubo (piso)
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		
-		glBindVertexArray(0);
+		DibujarPiso(pisoTextureID, glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(25.0f, 0.1f, 25.0f), VAO_Cubo, modelLoc);
 
-		// Si quieres mantener también el modelo OBJ, descomenta estas líneas:
-		// glm::mat4 model = glm::mat4(1.0f);
-		// model = glm::scale(model, glm::vec3(1.0f, 1.0f, 10.0f));
-		// view = camera.GetViewMatrix();
-		// glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		// Piso.Draw(lightingShader);
+		// DIBUJO DEL PASTO ENTRADA
+		DibujarPiso(pisoEntradaID, glm::vec3(0.0f, -0.5f, 17.5f), glm::vec3(25.0f, 0.1f, 10.0f), VAO_Cubo, modelLoc);
+
+
+
+	// ---------------------------------------------------------------------------------
+	// 							DIBUJO DE ESCENARIO ACUARIO
+	// ---------------------------------------------------------------------------------
+
+		// **** DIBUJOS DEL PISO Y ACCESORIOS DE ACUARIO ****
+		DibujarPiso(pisoAcuarioTextureID, glm::vec3(7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+
+
+
+		// **** DIBUJO DE ANIMALES ACUARIO ****
 
 		//modelo pinguino
 		glm::mat4 pinguino = glm::mat4(1.0f);
@@ -607,7 +674,6 @@ int main()
 		glBindVertexArray(0);
 
 		//modelo foca
-
 		glm::mat4 foca = glm::mat4(1.0f);
 		foca = glm::translate(foca, glm::vec3(28.0f, -0.2f, -20.5f));
 		foca = glm::rotate(foca, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -621,7 +687,7 @@ int main()
 
 		//modelo delfin
 		glm::mat4 delfin = glm::mat4(1.0f);
-		delfin = glm::translate(delfin, glm::vec3(0.0f, 0.0f, 0.0f));
+		delfin = glm::translate(delfin, glm::vec3(20.0f, -0.9f, -20.5f));
 		delfin = glm::rotate(delfin, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -630,6 +696,41 @@ int main()
 		Delfin.Draw(lightingShader);
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
+
+
+		// **** DIBUJO DEL PISO SELVA Y ACCESORIOS SELVA ****
+		DibujarPiso(pisoSelvaTextureID, glm::vec3(7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+
+
+
+
+		// **** DIBUJO DE ANIMALES SELVA ****
+
+
+
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE MODELOS SABANA (-x,-z)
+		// ---------------------------------------------------------------------------------
+
+		// **** DIBUJO DEL PISO SABANA Y ACCESORIOS SABANA ****
+		DibujarPiso(pisoSabanaTextureID, glm::vec3(-7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+
+
+
+		// **** DIBUJO DE ANIMALES SABANA ****
+
+
+
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE MODELOS DESIERTO (-x,z)
+		// ---------------------------------------------------------------------------------
+
+		// **** DIBUJO DEL PISO DESIERTO  Y COMPONENTES ****
+
+		DibujarPiso(pisoArenaTextureID, glm::vec3(-7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+
+		// **** DIBUJO DE ANIMALES DESIERTO ****
+
 
 		/*lightingShader.Use();
 		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");*/
@@ -653,59 +754,59 @@ int main()
 		// -------------------------------------------------------------------------------- -
 	// 							DIBUJO DE MODELO JERÁRQUICO (BRAZO)
 	// ---------------------------------------------------------------------------------
-		// Textura
-		// (Asumimos que la textura difusa va en la unidad 0)
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, armTextureID);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, armTextureID);
+		//// Textura
+		//// (Asumimos que la textura difusa va en la unidad 0)
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, armTextureID);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, armTextureID);
 
-		glBindVertexArray(VAO_Cubo); // Usa el VAO del cubo
+		//glBindVertexArray(VAO_Cubo); // Usa el VAO del cubo
 
-		// Habilitar los atributos (Ubicación 0 y 1 ya están habilitadas por defecto)
-		glEnableVertexAttribArray(0); // Posición
-		glEnableVertexAttribArray(1); // Normal
-		glEnableVertexAttribArray(2); //Habilitar Coordenadas de Textura
+		//// Habilitar los atributos (Ubicación 0 y 1 ya están habilitadas por defecto)
+		//glEnableVertexAttribArray(0); // Posición
+		//glEnableVertexAttribArray(1); // Normal
+		//glEnableVertexAttribArray(2); //Habilitar Coordenadas de Textura
 
-		// Hombro
-		glm::mat4 model_brazo = glm::mat4(1.0f);
-		glm::mat4 modelTemp = glm::mat4(1.0f);
-		// ... (Transformaciones hombro) ...
-		model_brazo = glm::translate(model_brazo, glm::vec3(2.0f, 1.0f, 0.0f));
-		model_brazo = glm::rotate(model_brazo, glm::radians(hombro_rot), glm::vec3(0.0f, 0.0f, 1.0f));
-		modelTemp = model_brazo = glm::translate(model_brazo, glm::vec3(1.0f, 0.0f, 0.0f));
-		model_brazo = glm::scale(model_brazo, glm::vec3(2.0f, 0.4f, 0.4f));
-		glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model_brazo));
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//// Hombro
+		//glm::mat4 model_brazo = glm::mat4(1.0f);
+		//glm::mat4 modelTemp = glm::mat4(1.0f);
+		//// ... (Transformaciones hombro) ...
+		//model_brazo = glm::translate(model_brazo, glm::vec3(2.0f, 1.0f, 0.0f));
+		//model_brazo = glm::rotate(model_brazo, glm::radians(hombro_rot), glm::vec3(0.0f, 0.0f, 1.0f));
+		//modelTemp = model_brazo = glm::translate(model_brazo, glm::vec3(1.0f, 0.0f, 0.0f));
+		//model_brazo = glm::scale(model_brazo, glm::vec3(2.0f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model_brazo));
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		// Antebrazo
-		// ... (Transformaciones antebrazo) ...
-		model_brazo = glm::translate(modelTemp, glm::vec3(1.0f, 0.0f, 0.0f));
-		model_brazo = glm::rotate(model_brazo, glm::radians(codo_rot), glm::vec3(0.0f, 0.0f, 1.0f));
-		model_brazo = glm::translate(model_brazo, glm::vec3(0.75f, 0.0f, 0.0f));
-		model_brazo = glm::scale(model_brazo, glm::vec3(1.5f, 0.4f, 0.4f));
-		glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model_brazo));
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//// Antebrazo
+		//// ... (Transformaciones antebrazo) ...
+		//model_brazo = glm::translate(modelTemp, glm::vec3(1.0f, 0.0f, 0.0f));
+		//model_brazo = glm::rotate(model_brazo, glm::radians(codo_rot), glm::vec3(0.0f, 0.0f, 1.0f));
+		//model_brazo = glm::translate(model_brazo, glm::vec3(0.75f, 0.0f, 0.0f));
+		//model_brazo = glm::scale(model_brazo, glm::vec3(1.5f, 0.4f, 0.4f));
+		//glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model_brazo));
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		glBindVertexArray(0); // Desvincular VAO_Cubo
-
-
+		//glBindVertexArray(0); // Desvincular VAO_Cubo
 
 
-		// Also draw the lamp object, again binding the appropriate shader
-		lampShader.Use();
-		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
-		modelLoc = glGetUniformLocation(lampShader.Program, "model");
-		viewLoc = glGetUniformLocation(lampShader.Program, "view");
-		projLoc = glGetUniformLocation(lampShader.Program, "projection");
 
-		// Set matrices
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		glm::mat4 model = glm::mat4(1);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		//// Also draw the lamp object, again binding the appropriate shader
+		//lampShader.Use();
+		//// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
+		//modelLoc = glGetUniformLocation(lampShader.Program, "model");
+		//viewLoc = glGetUniformLocation(lampShader.Program, "view");
+		//projLoc = glGetUniformLocation(lampShader.Program, "projection");
+
+		//// Set matrices
+		//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		//glm::mat4 model = glm::mat4(1);
+		//model = glm::translate(model, lightPos);
+		//model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 
 		// Swap the screen buffers
@@ -719,6 +820,50 @@ int main()
 
 
 	return 0;
+}
+
+
+
+// --- Función para configurar los parametros del piso de textura repetible ---
+void ConfigurarTexturaRepetible(GLuint textureID)
+{
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+
+// --- Función para dibujar pisos con textura ---
+void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc)
+{
+	// Activar y enlazar la textura
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	// Enlazar el VAO del cubo
+	glBindVertexArray(VAO_Cubo);
+
+	// Habilitar los atributos necesarios
+	glEnableVertexAttribArray(0); // Posición
+	glEnableVertexAttribArray(1); // Normal
+	glEnableVertexAttribArray(2); // TexCoords
+
+	// Crear matriz de transformación para el piso
+	glm::mat4 model_piso = glm::mat4(1.0f);
+	model_piso = glm::translate(model_piso, posicion);
+	model_piso = glm::scale(model_piso, escala);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model_piso));
+
+	// Dibujar el cubo (piso)
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glBindVertexArray(0);
 }
 
 
@@ -754,19 +899,6 @@ void DoMovement()
 
 	}
 
-	if (keys[GLFW_KEY_T])
-	{
-		pointLightPositions[0].x += 0.01f;
-	}
-	if (keys[GLFW_KEY_G])
-	{
-		pointLightPositions[0].x -= 0.01f;
-	}
-
-	if (keys[GLFW_KEY_Y])
-	{
-		pointLightPositions[0].y += 0.01f;
-	}
 
 	if (keys[GLFW_KEY_H])
 	{
