@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <cmath>
 
 // GLEW
@@ -32,7 +32,7 @@ void DoMovement();
 
 
 // =================================================================================
-// 	CONFIGURACI�N INICIAL Y VARIABLES GLOBALES
+// 	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
 // =================================================================================
 //Configurar funciones para repetir textura de piso
 void ConfigurarTexturaRepetible(GLuint textureID);
@@ -45,7 +45,7 @@ const GLuint WIDTH = 1000, HEIGHT = 800;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 
-// Configuraci�n de la c�mara
+// Configuración de la cámara
 Camera  camera(glm::vec3(0.0f, 0.0f, 21.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
@@ -68,63 +68,47 @@ glm::vec3 pointLightPositions[] = {
 
 
 // =================================================================================
-// 						ANIMACI�N Y POSICIONES BASE DE ANIMALES
+// 						ANIMACIÓN Y POSICIONES BASE DE ANIMALES
 // =================================================================================
 
-float hombro_rot = 0.0f;
-float codo_rot = 0.0f;
-float tiempo_animacion = 0.0f; // Variable para animaciones autom�ticas
 
+//		Pinguino (Cuadrante X, -Z)
+float PinAlaIzq = 0.0f;
+float PinAlaDer = 0.0f;
+float PinScale = 0.70f;
+glm::vec3 PinguinoPos = glm::vec3(10.0f, -0.1f, -4.0f);
 
-// V�rtices del cubo 
-//float vertices_UV[] = {
-//
-//	// Posiciones           // Normales
-//	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-//		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-//		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-//		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-//	   -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-//	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-//
-//	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-//		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-//		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-//		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-//	   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-//	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-//
-//	   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-//	   -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-//	   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-//	   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-//	   -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-//	   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-//
-//		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-//		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-//		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-//		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-//		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-//		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-//
-//	   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-//		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-//		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-//		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-//	   -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-//	   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-//
-//	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-//		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-//		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-//		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-//	   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-//	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-//};
+bool animarPinguino = false;
+float startTimePinguino = 0.0f;
+bool teclaC_presionada = false;
 
+//		Foca (Cuadrante X, -Z)
+float rotFocaMedio = 0.0f;
+float rotFocaCola = 0.0f;
+float FocaScale = 1.6f; // Ajusta la escala general de la foca si es necesario
+glm::vec3 focaPosBase = glm::vec3(5.0f, -0.17f, -9.0f); // Posición base
+glm::vec3 focaPosActual = focaPosBase; // Posición que se animará
+float focaRotY = -90.0f; //Rotación inicial (mirando a +Z)
 
-// V�rtices del cubo CON COORDENADAS DE TEXTURA
+float rotFocaPataDer = 0.0f; // Rotación Aleta Derecha (Eje X)
+float rotFocaPataIzq = 0.0f; // Rotación Aleta Izquierda (Eje X)
+
+bool animarFoca = false;
+float startTimeFoca = 0.0f;
+bool teclaB_presionada = false; // Usaremos 'B' para la foca
+
+//delfin (Cuadrante X, -Z)
+glm::vec3 delfinPosBase = glm::vec3(2.8f, -0.9f, -10.7f); // Posición inicial
+glm::vec3 delfinPosActual = delfinPosBase; // Posición que se actualizará
+float delfinRotY = -90.0f; // Inicia mirando a +X
+float delfinRotX = 0.0f; // Cabeceo (Pitch)
+float DelfinScale = 0.8f; // Escala del delfín
+
+bool animarDelfin = false;
+float startTimeDelfin = 0.0f;
+bool teclaD_presionada = false; // Usaremos 'X' para activarlo
+
+// Vértices del cubo CON COORDENADAS DE TEXTURA
 float vertices[] = {
 	// Posiciones           // Normales           // Coordenadas de Textura (U, V)
 	// Cara Trasera (-Z)
@@ -187,35 +171,15 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 
 
-//void pataDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO/*, GLuint texturaID*/) {
-//
-//	modelo = glm::mat4(1);
-//	modelo = glm::scale(modelo, escala); // tama�o de la pata
-//	modelo = glm::translate(modelo, traslado);// colocamos la pata en una esquina
-//	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelo));
-//
-//	// Asegurarnos de que el VAO con los atributos est� enlazado
-//	glBindVertexArray(VAO);
-//	// Activar textura y enlazar
-//	/*glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, texturaID);*/
-//	/*glUniform3fv(lampColorLoc, 1, glm::value_ptr(armColor));*/
-//
-//	// Dibujar cubo (36 v�rtices)
-//	glDrawArrays(GL_TRIANGLES, 0, 36);
-//}
-
-// (Variables globales... armColor, etc.)
-
 void pataDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID)
 {
 	// 1. Configurar la matriz del modelo para esta parte
 	modelo = glm::mat4(1);
-	modelo = glm::scale(modelo, escala); // tama�o
-	modelo = glm::translate(modelo, traslado);// posici�n
+	modelo = glm::scale(modelo, escala); // tamaño
+	modelo = glm::translate(modelo, traslado);// posición
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelo));
 
-	// 2. Activar y enlazar la textura espec�fica para esta parte
+	// 2. Activar y enlazar la textura específica para esta parte
 	//    Asumimos que el shader ya tiene los uniforms de sampler (material.diffuse = 0, material.specular = 1)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texturaID);
@@ -225,27 +189,50 @@ void pataDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint unif
 	// 3. Enlazar el VAO del cubo
 	glBindVertexArray(VAO);
 
-	// 4. *** CR�TICO *** Habilitar TODOS los atributos que usa lightingShader
-	// (El lampShader los deshabilita, as� que hay que volver a habilitarlos)
-	glEnableVertexAttribArray(0); // Posici�n
+	// 4. *** CRÍTICO *** Habilitar TODOS los atributos que usa lightingShader
+	// (El lampShader los deshabilita, así que hay que volver a habilitarlos)
+	glEnableVertexAttribArray(0); // Posición
 	glEnableVertexAttribArray(1); // Normal
 	glEnableVertexAttribArray(2); // TexCoords
 
 	// 5. Dibujar el cubo
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	// 6. Desvincular (buena pr�ctica)
+	// 6. Desvincular (buena práctica)
 	glBindVertexArray(0);
 
 
 }
 
+void cuboDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID, float rotacion)
+{
+	// 1. Configurar la matriz del modelo para esta parte
+	modelo = glm::mat4(1);
+	modelo = glm::translate(modelo, traslado);// primero traslaci�n
+	modelo = glm::rotate(modelo, rotacion, glm::vec3(0.0f, 1.0f, 0.0f)); // luego rotaci�n
+	modelo = glm::scale(modelo, escala); // finalmente escala
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelo));
+
+	// 2. Activar y enlazar la textura
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texturaID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texturaID);
+
+	glBindVertexArray(VAO);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
 
 
 int main()
 {
 	// =================================================================================
-	// INICIALIZACI�N DE GLFW, GLEW Y VENTANA
+	// INICIALIZACIÓN DE GLFW, GLEW Y VENTANA
 	// =================================================================================
 
 	glfwInit();
@@ -300,12 +287,25 @@ int main()
 	// =================================================================================
 
 	Model Piso((char*)"Models/piso.obj");
-	Model Pinguino((char*)"Models/pinguino.obj");
-	Model Foca((char*)"Models/foca.obj");
 	Model Delfin((char*)"Models/delfin.obj");
+	Model cuerpoPin((char*)"Models/pinguino/cuerpo.obj");
+	Model arm1((char*)"Models/pinguino/arm1.obj");
+	Model arm2((char*)"Models/pinguino/aletIzq.obj");
+	Model Foca1((char*)"Models/foca/cuerpoFoca.obj");
+	Model FocaCo((char*)"Models/foca/medio.obj");
+	Model FocaMe((char*)"Models/foca/cola.obj");
+	Model Agua((char*)"Models/agua/agua.obj");
+	Model FocaDer((char*)"Models/foca/FocaDer.obj");
+	Model FocaIzq((char*)"Models/foca/FocaIzq.obj");
+	Model iglu((char*)"Models/iglu/iglu3d.obj");
+	Model huevo((char*)"Models/huevo/huevo.obj");
+	Model pino((char*)"Models/pino/nievepino.obj");
 
 	// Carga textura
 	GLuint armTextureID = TextureFromFile("images/madera.jpg", ".");
+	GLuint greenTextureID = TextureFromFile("images/textverde.jpg", ".");
+	GLuint amarilloTextureID = TextureFromFile("images/textamarillo.jpg", ".");
+	GLuint cafeTextureID = TextureFromFile("images/cafe.jpg", ".");
 
 
 	// =================================================================================
@@ -343,7 +343,7 @@ int main()
 	ConfigurarTexturaRepetible(pisoEntradaID);
 
 	// *** TEXTURA PARA EL PISO ACUARIO ***
-	GLuint pisoAcuarioTextureID = TextureFromFile("images/acuario.jpg", ".");
+	GLuint pisoAcuarioTextureID = TextureFromFile("images/textnieve.jpg", ".");
 	ConfigurarTexturaRepetible(pisoAcuarioTextureID);
 
 	// *** TEXTURA PARA EL PISO SELVA ***
@@ -360,7 +360,7 @@ int main()
 
 
 	// =================================================================================
-	// 					CONFIGURACI�N DE V�RTICES PARA PRIMITIVAS
+	// 					CONFIGURACIÓN DE VÉRTICES PARA PRIMITIVAS
 	// =================================================================================
 
 	GLuint VBO, VAO;
@@ -384,7 +384,7 @@ int main()
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
 	// =================================================================================
-		// 					CONFIGURACI�N DE V�RTICES PARA PRIMITIVAS (CUBO)
+		// 					CONFIGURACIÓN DE VÉRTICES PARA PRIMITIVAS (CUBO)
 		// =================================================================================
 	GLuint VBO_Cubo, VAO_Cubo;
 	glGenVertexArrays(1, &VAO_Cubo);
@@ -396,18 +396,18 @@ int main()
 
 	glBindVertexArray(VAO_Cubo); // Enlazar el VAO
 
-	// Atributo de Posici�n (Location 0)
+	// Atributo de Posición (Location 0)
 	// El Stride (paso) ahora es de 8 floats
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 
 	// Atributo de Normal (Location 1)
-	// El Stride es 8, el Offset (desplazamiento) es despu�s de los 3 floats de posici�n
+	// El Stride es 8, el Offset (desplazamiento) es después de los 3 floats de posición
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	// *** NUEVO: Atributo de Coordenadas de Textura (Location 2) ***
-	// El Stride es 8, el Offset es despu�s de 3 (pos) + 3 (norm) = 6 floats
+	// El Stride es 8, el Offset es después de 3 (pos) + 3 (norm) = 6 floats
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
@@ -415,7 +415,7 @@ int main()
 
 
 	// =================================================================================
-	// 		CONFIGURACI�N DE V�RTICES PARA PISO DE ENTRADA
+	// 		CONFIGURACIÓN DE VÉRTICES PARA PISO DE ENTRADA
 	// =================================================================================
 	GLuint VBO_Entrada, VAO_Entrada;
 	glGenVertexArrays(1, &VAO_Entrada);
@@ -425,7 +425,7 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_Entrada);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Atributo de Posici�n (Location 0)
+	// Atributo de Posición (Location 0)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
@@ -484,7 +484,7 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.6f, 0.6f, 0.6f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.6f, 0.6f, 0.6f);
 
-		// Luces Puntuales (pointLights) - Usando los colores de las l�mparas
+		// Luces Puntuales (pointLights) - Usando los colores de las lámparas
 		// Point light 1
 		glm::vec3 lightColor;
 		lightColor.x = abs(sin(glfwGetTime() * Light1.x));
@@ -498,8 +498,8 @@ int main()
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse")/*, lampColors[0].r, lampColors[0].g, lampColors[0].b*/);       // Difuso Rojo
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular")/*, lampColors[0].r, lampColors[0].g, lampColors[0].b*/);      // Especular Rojo
 		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f); // Atenuaci�n espec�fica
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f); // Atenuaci�n espec�fica
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f); // Atenuación específica
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f); // Atenuación específica
 
 		//// Point light 1 (Verde)
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
@@ -507,8 +507,8 @@ int main()
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), lampColors[1].r, lampColors[1].g, lampColors[1].b);       // Difuso Verde
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), lampColors[1].r, lampColors[1].g, lampColors[1].b);      // Especular Verde
 		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.09f); // Atenuaci�n ejemplo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.032f); // Atenuaci�n ejemplo
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.09f); // Atenuación ejemplo
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.032f); // Atenuación ejemplo
 
 		//// Point light 2 (Azul)
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"), pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
@@ -516,8 +516,8 @@ int main()
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), lampColors[2].r, lampColors[2].g, lampColors[2].b);       // Difuso Azul
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), lampColors[2].r, lampColors[2].g, lampColors[2].b);      // Especular Azul
 		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f); // Atenuaci�n ejemplo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f); // Atenuaci�n ejemplo
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f); // Atenuación ejemplo
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f); // Atenuación ejemplo
 
 		//// Point light 3 (Blanco)
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].position"), pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
@@ -525,8 +525,8 @@ int main()
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].diffuse"), lampColors[3].r, lampColors[3].g, lampColors[3].b);       // Difuso Blanco
 		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].specular"), lampColors[3].r, lampColors[3].g, lampColors[3].b);      // Especular Blanco
 		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].linear"), 0.09f); // Atenuaci�n ejemplo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].quadratic"), 0.032f); // Atenuaci�n ejemplo
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].linear"), 0.09f); // Atenuación ejemplo
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].quadratic"), 0.032f); // Atenuación ejemplo
 
 
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
@@ -565,7 +565,7 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].linear"), 0.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].quadratic"), 0.0f);
-		// SpotLight  //una luz tipo linterna en la c�mara
+		// SpotLight  //una luz tipo linterna en la cámara
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.position"), camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.direction"), camera.GetFront().x, camera.GetFront().y, camera.GetFront().z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLight.ambient"), 0.8f, 0.8f, 0.8f);
@@ -606,7 +606,7 @@ int main()
 		//int textureWidth, textureHeight, nrChannels;
 		//unsigned char* image;
 
-		//// Funci�n lambda para cargar texturas
+		//// Función lambda para cargar texturas
 		//auto cargarTextura = [&](const char* path, GLuint& tex) {
 		//	glGenTextures(1, &tex);
 		//	glBindTexture(GL_TEXTURE_2D, tex);
@@ -623,7 +623,7 @@ int main()
 		//	}
 		//	stbi_image_free(image);
 
-		//	// Par�metros de textura
+		//	// Parámetros de textura
 		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -657,45 +657,331 @@ int main()
 		// **** DIBUJOS DEL PISO Y ACCESORIOS DE ACUARIO ****
 		DibujarPiso(pisoAcuarioTextureID, glm::vec3(7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
 
+		//modelo Agua
+		glm::mat4 textAgua = glm::mat4(1.0f);
+		textAgua = glm::translate(textAgua, glm::vec3(7.24f, -0.5f, -10.9f));
+		textAgua = glm::rotate(textAgua, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		textAgua = glm::scale(textAgua, glm::vec3(1.6f, 0.05f, 3.3f));
+		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(textAgua));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		Agua.Draw(lightingShader);
+		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		glBindVertexArray(0);
+
+		//modelo IGLU
+		glm::mat4 Iglu3d = glm::mat4(1.0f);
+		Iglu3d = glm::translate(Iglu3d, glm::vec3(9.9f, 0.5f, -7.0f));
+		Iglu3d = glm::rotate(Iglu3d, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		Iglu3d = glm::scale(Iglu3d, glm::vec3(4.0f, 4.0f, 4.0f));
+		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Iglu3d));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		iglu.Draw(lightingShader);
+		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		glBindVertexArray(0);
+
+		//modelo huevo
+		glm::mat4 pingu = glm::mat4(1.0f);
+		pingu = glm::translate(pingu, glm::vec3(9.9f, -0.3f, -7.0f));
+		pingu = glm::rotate(pingu, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		pingu = glm::scale(pingu, glm::vec3(0.4f, 0.4f, 0.4f));
+		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pingu));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		huevo.Draw(lightingShader);
+		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		glBindVertexArray(0);
+
+		//modelo pino
+		glm::mat4 nievePino = glm::mat4(1.0f);
+		nievePino = glm::translate(nievePino, glm::vec3(2.9f, 1.15f, -3.1f));
+		nievePino = glm::rotate(nievePino, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		nievePino = glm::scale(nievePino, glm::vec3(3.2f, 3.2f, 3.2f));
+		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(nievePino));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		pino.Draw(lightingShader);
+		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		glBindVertexArray(0);
+
+
 
 
 		// **** DIBUJO DE ANIMALES ACUARIO ****
 
-		//modelo pinguino
-		glm::mat4 pinguino = glm::mat4(1.0f);
-		pinguino = glm::translate(pinguino, glm::vec3(36.0f, 0.15f, -20.5f));
-		pinguino = glm::rotate(pinguino, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pinguino));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Pinguino.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
+		// --- FOCA ANIMADA ---
+		if (animarFoca)
+		{
+			// Obtener el tiempo transcurrido
+			float t = glfwGetTime() - startTimeFoca;
 
-		//modelo foca
-		glm::mat4 foca = glm::mat4(1.0f);
-		foca = glm::translate(foca, glm::vec3(28.0f, -0.2f, -20.5f));
-		foca = glm::rotate(foca, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(foca));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Foca.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
+			// --- Parámetros de la Animación ---
+			float moveDuration = 4.0f; // 6 segundos de avance
+			float turnDuration = 1.0f; // 1 segundo para girar
+			float totalLoopTime = (moveDuration + turnDuration) * 2.0f; // 14 segundos en total
+			float t_loop = fmod(t, totalLoopTime); // Tiempo en el bucle actual (0 a 14)
 
-		//modelo delfin
+			float moveDist = 6.0f; // Qué tan lejos avanza (distancia total del recorrido)
+			float aleteoVelocidad = 4.0f; // Velocidad de aleteo (patas)
+			float colaVelocidad = 2.2f; // Velocidad de cola
+
+			// --- Amplitudes SUTILES (Corregidas) ---
+			float ampPata = 8.0f;      // Amplitud Patas (Reducido de 25)
+			float ampColaMedio = 2.0f; // Amplitud Media (Como tu código anterior)
+			float ampColaFin = 3.0f;   // Amplitud Cola (Un poco más que el medio)
+
+
+			// --- Máquina de Estados (Corregida) ---
+			if (t_loop < moveDuration) // --- Estado 1: Mover a +Z (0 a 6 seg) ---
+			{
+				float phase = t_loop / moveDuration; // 0.0 a 1.0
+				focaPosActual.z = focaPosBase.z + (phase * moveDist); // Avanza hacia -Z (acercándose)
+				focaPosActual.x = focaPosBase.x; // X se mantiene
+				focaRotY = -90.0f; // Mirando hacia -Z
+
+				// Aleteo Patas (en Eje X)
+				rotFocaPataDer = sin(t * aleteoVelocidad) * ampPata;
+				rotFocaPataIzq = -sin(t * aleteoVelocidad) * ampPata;
+				// Aleteo Cola (en Eje Z - Vertical)
+				rotFocaMedio = sin(t * colaVelocidad) * ampColaMedio;
+				rotFocaCola = sin(t * colaVelocidad + 0.6f) * ampColaFin;
+			}
+			else if (t_loop < moveDuration + turnDuration) // --- Estado 2: Giro 1 (6 a 7 seg) ---
+			{
+				focaPosActual.z = focaPosBase.z + moveDist; // Se queda en el destino
+				float phase = (t_loop - moveDuration) / turnDuration; // 0.0 a 1.0
+				focaRotY = -90.0f + (phase * 180.0f); // Giro de -90 a +90
+
+				// Detener aleteo
+				rotFocaPataDer = 0.0f; rotFocaPataIzq = 0.0f;
+				rotFocaMedio = 0.0f; rotFocaCola = 0.0f;
+			}
+			else if (t_loop < (moveDuration * 2.0f) + turnDuration) // --- Estado 3: Mover a -Z (7 a 13 seg) ---
+			{
+				float phase = (t_loop - (moveDuration + turnDuration)) / moveDuration; // 0.0 a 1.0
+				focaPosActual.z = (focaPosBase.z + moveDist) - (phase * moveDist); // Regresa a pos inicial
+				focaPosActual.x = focaPosBase.x;
+				focaRotY = 90.0f; // Mirando hacia -Z
+
+				// Aleteo Patas (en Eje X)
+				rotFocaPataDer = sin(t * aleteoVelocidad) * ampPata;
+				rotFocaPataIzq = -sin(t * aleteoVelocidad) * ampPata;
+				// Aleteo Cola (en Eje Z - Vertical)
+				rotFocaMedio = sin(t * colaVelocidad) * ampColaMedio;
+				rotFocaCola = sin(t * colaVelocidad + 0.6f) * ampColaFin;
+			}
+			else // --- Estado 4: Giro 2 (13 a 14 seg) ---
+			{
+				focaPosActual.z = focaPosBase.z; // Se queda en el inicio
+				float phase = (t_loop - (moveDuration * 2.0f + turnDuration)) / turnDuration; // 0.0 a 1.0
+				focaRotY = 90.0f + (phase * 180.0f); // Giro de 90 a 270 (que es -90)
+
+				// Detener aleteo
+				rotFocaPataDer = 0.0f; rotFocaPataIzq = 0.0f;
+				rotFocaMedio = 0.0f; rotFocaCola = 0.0f;
+			}
+		}
+		else
+		{
+			// Resetear a posición inicial si no está animada
+			focaPosActual = focaPosBase;
+			focaRotY = -90.0f; // Listo para empezar (mirando a +Z)
+			rotFocaMedio = 0.0f;
+			rotFocaCola = 0.0f;
+			rotFocaPataDer = 0.0f;
+			rotFocaPataIzq = 0.0f;
+		}
+
+
+		// Jerarquía: Cuerpo -> Medio -> Cola
+		//          y: Cuerpo -> AletaDer
+		//          y: Cuerpo -> AletaIzq
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+
+		// 1. CUERPO (Padre Principal) [Foca1]
+		glm::mat4 modelCuerpo = glm::mat4(1.0f);
+		modelCuerpo = glm::translate(modelCuerpo, focaPosActual); // Mover a la posición animada
+		modelCuerpo = glm::rotate(modelCuerpo, glm::radians(focaRotY), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación animada
+		modelCuerpo = glm::scale(modelCuerpo, glm::vec3(FocaScale)); // Escala general
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCuerpo));
+		Foca1.Draw(lightingShader); // Dibuja Cuerpo
+
+		// 2. MEDIO (Hijo del Cuerpo) [FocaCo]
+		glm::mat4 modelMedio = modelCuerpo; // Hereda
+		glm::vec3 pivotMedio = glm::vec3(0.0f, 0.0f, -1.0f); // ¡AJUSTA ESTO!
+		modelMedio = glm::translate(modelMedio, pivotMedio);
+		modelMedio = glm::rotate(modelMedio, glm::radians(rotFocaMedio), glm::vec3(0.0f, 0.0f, 1.0f)); // <-- CORREGIDO: Rotar en Eje Z (Vertical)
+		modelMedio = glm::translate(modelMedio, -pivotMedio);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMedio));
+		FocaCo.Draw(lightingShader); // Dibuja Medio
+
+		// 3. COLA (Hijo del Medio) [FocaMe]
+		glm::mat4 modelCola = modelMedio; // Hereda
+		glm::vec3 pivotCola = glm::vec3(0.0f, 0.0f, -0.8f);
+		modelCola = glm::translate(modelCola, pivotCola);
+		modelCola = glm::rotate(modelCola, glm::radians(rotFocaCola), glm::vec3(0.0f, 0.0f, 1.0f)); // <-- CORREGIDO: Rotar en Eje Z (Vertical)
+		modelCola = glm::translate(modelCola, -pivotCola);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCola));
+		FocaMe.Draw(lightingShader); // Dibuja Cola
+
+		// 4. ALETA DERECHA (Hijo del Cuerpo) [FocaDer]
+		glm::mat4 FocaPataDerecha = modelCuerpo; // Hereda del CUERPO
+		glm::vec3 pivotPataDer = glm::vec3(0.3f, 0.1f, -0.2f);
+		FocaPataDerecha = glm::translate(FocaPataDerecha, pivotPataDer);
+		FocaPataDerecha = glm::rotate(FocaPataDerecha, glm::radians(rotFocaPataDer), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotar en Z (Aleteo)
+		FocaPataDerecha = glm::translate(FocaPataDerecha, -pivotPataDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(FocaPataDerecha));
+		FocaDer.Draw(lightingShader); // Dibuja Aleta Derecha
+
+		// 5. ALETA IZQUIERDA (Hijo del Cuerpo) [FocaIzq]
+		glm::mat4 FocaPataIzq = modelCuerpo; // Hereda del CUERPO
+		glm::vec3 pivotPataIzq = glm::vec3(-0.3f, 0.1f, -0.2f);
+		FocaPataIzq = glm::translate(FocaPataIzq, pivotPataIzq);
+		FocaPataIzq = glm::rotate(FocaPataIzq, glm::radians(rotFocaPataIzq), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotar en Z (Aleteo)
+		FocaPataIzq = glm::translate(FocaPataIzq, -pivotPataIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(FocaPataIzq));
+		FocaIzq.Draw(lightingShader); // Dibuja Aleta Izquierda
+
+		glBindVertexArray(0); // Desvincular al final
+
+
+		//fin de foca
+		// -------Inicio Delfin ----------
+
+		if (animarDelfin)
+		{
+			float t = glfwGetTime() - startTimeDelfin;
+
+			// --- Definir parámetros del salto ---
+			float jumpDuration = 4.0f; // 4 segundos para el salto de ida
+			float turnDuration = 1.0f; // 1 segundo para girar
+			float totalLoopTime = (jumpDuration + turnDuration) * 2.0f; // 10 segundos en total
+			float t_loop = fmod(t, totalLoopTime); // Tiempo en el bucle actual (0 a 10)
+
+			float jumpDist = 9.0f; // Qué tan lejos salta (en X)
+			float jumpHeight = 2.8f; // Qué tan alto salta (en Y)
+			float pitchAngle = -20.0f; // Ángulo de "mirar arriba" (rotación en X)
+
+			// --- Máquina de Estados de la Animación ---
+			if (t_loop < jumpDuration) // --- Estado 1: Primer Salto (hacia +X) ---
+			{
+				float phase = t_loop / jumpDuration; // 0.0 a 1.0
+				delfinPosActual.x = delfinPosBase.x + (phase * jumpDist); // Mover en X
+				delfinPosActual.y = delfinPosBase.y + (sin(phase * 3.14159f) * jumpHeight); // Arco en Y
+				delfinPosActual.z = delfinPosBase.z; // Z se mantiene constante
+				delfinRotX = pitchAngle; // Mirar arriba
+				delfinRotY = 0.0f; // Mirando hacia +X
+			}
+			else if (t_loop < jumpDuration + turnDuration) // --- Estado 2: Primer Giro (gira a -X) ---
+			{
+				delfinPosActual.x = delfinPosBase.x + jumpDist; // Se queda en la posición de aterrizaje
+				delfinPosActual.y = delfinPosBase.y;
+				delfinPosActual.z = delfinPosBase.z;
+				delfinRotX = 0.0f; // Se nivela
+
+				float phase = (t_loop - jumpDuration) / turnDuration; // 0.0 a 1.0
+				delfinRotY = 0.0f + (phase * 180.0f); // Giro de -90 a +90 grados
+			}
+			else if (t_loop < jumpDuration * 2.0f + turnDuration) // --- Estado 3: Segundo Salto (hacia -X) ---
+			{
+				float phase = (t_loop - (jumpDuration + turnDuration)) / jumpDuration; // 0.0 a 1.0
+				delfinPosActual.x = (delfinPosBase.x + jumpDist) - (phase * jumpDist); // Mover de regreso en X
+				delfinPosActual.y = delfinPosBase.y + (sin(phase * 3.14159f) * jumpHeight); // Arco en Y
+				delfinPosActual.z = delfinPosBase.z;
+				delfinRotX = pitchAngle; // Mirar arriba
+				delfinRotY = -180.0f; // Mirando hacia -X
+			}
+			else // --- Estado 4: Segundo Giro (gira a +X) ---
+			{
+				delfinPosActual.x = delfinPosBase.x; // Se queda en la posición inicial
+				delfinPosActual.y = delfinPosBase.y;
+				delfinPosActual.z = delfinPosBase.z;
+				delfinRotX = 0.0f; // Se nivela
+
+				float phase = (t_loop - (jumpDuration * 2.0f + turnDuration)) / turnDuration; // 0.0 a 1.0
+				delfinRotY = -180.0f + (phase * 180.0f); // Giro de 90 a 270 grados (que es -90)
+			}
+		}
+		else
+		{
+			// Resetear a posición inicial si no está animada
+			delfinPosActual = delfinPosBase;
+			delfinRotX = 0.0f;
+			delfinRotY = 0.0f; // Mirando hacia +X (listo para empezar)
+		}
+
 		glm::mat4 delfin = glm::mat4(1.0f);
-		delfin = glm::translate(delfin, glm::vec3(20.0f, -0.9f, -20.5f));
-		delfin = glm::rotate(delfin, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+		delfin = glm::translate(delfin, delfinPosActual); // 1. Mover a la posición actual
+		delfin = glm::rotate(delfin, glm::radians(delfinRotY), glm::vec3(0.0f, 1.0f, 0.0f)); // 2. Girar (Yaw)
+		delfin = glm::rotate(delfin, glm::radians(delfinRotX), glm::vec3(0.0f, 0.0f, 1.0f)); // 3. Cabecear (Pitch)
+		delfin = glm::scale(delfin, glm::vec3(DelfinScale)); // 4. Escalar
+
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(delfin));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Delfin.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
+
+		// -------Fin Delfin ----------
+
+
+		// --- INICIO PINGUINO ---
+		if (animarPinguino)
+		{
+			// Obtener el tiempo transcurrido desde que se inició la animación
+			float t = glfwGetTime() - startTimePinguino;
+
+			// Definir la animación
+			float amplitud = 14.0f; // Qué tanto suben y bajan (en grados)
+			float velocidad = 3.0f;  // Qué tan rápido aletea
+			float aleteo = sin(t * velocidad) * amplitud;
+
+			PinAlaIzq = aleteo;
+			PinAlaDer = -aleteo; // Ala opuesta para movimiento alternado
+		}
+		// Cuerpo del Pinguino
+		glm::mat4 PinguinoCuerpo = glm::mat4(1.0f);
+		PinguinoCuerpo = glm::translate(PinguinoCuerpo, PinguinoPos); // Usa la variable de posición
+		PinguinoCuerpo = glm::rotate(PinguinoCuerpo, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación base
+		PinguinoCuerpo = glm::scale(PinguinoCuerpo, glm::vec3(PinScale)); // Escala
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(PinguinoCuerpo));
+		cuerpoPin.Draw(lightingShader);
+		glBindVertexArray(0);
+
+		// Ala Derecha (arm1)
+		glm::mat4 PinguinoDer = glm::mat4(1.0f);
+		PinguinoDer = glm::translate(PinguinoDer, PinguinoPos); // 1. Mover a la posición base
+		PinguinoDer = glm::rotate(PinguinoDer, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // 2. Rotar base
+
+		// *** APLICAR ANIMACIÓN DE ALATEO (Rotación en Eje Z) ***
+		PinguinoDer = glm::rotate(PinguinoDer, glm::radians(PinAlaDer), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		PinguinoDer = glm::scale(PinguinoDer, glm::vec3(PinScale)); // 4. Escalar
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(PinguinoDer));
+		arm1.Draw(lightingShader);
+		glBindVertexArray(0);
+
+		// Ala Izquierda (arm2)
+		// Nota: El código original tenía un error, usaba PinguinoDer como base para PinguinoIzq
+		glm::mat4 PinguinoIzq = glm::mat4(1.0f);
+		PinguinoIzq = glm::translate(PinguinoIzq, PinguinoPos); // 1. Mover a la posición base
+		PinguinoIzq = glm::rotate(PinguinoIzq, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // 2. Rotar base
+
+		// *** APLICAR ANIMACIÓN DE ALATEO (Rotación en Eje Z) ***
+		PinguinoIzq = glm::rotate(PinguinoIzq, glm::radians(PinAlaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		PinguinoIzq = glm::scale(PinguinoIzq, glm::vec3(PinScale)); // 4. Escalar
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(PinguinoIzq));
+		arm2.Draw(lightingShader);
+		glBindVertexArray(0);
+
+		// --- FIN PINGUINO ---
 
 
 		// **** DIBUJO DEL PISO SELVA Y ACCESORIOS SELVA ****
@@ -746,13 +1032,13 @@ int main()
 		pataDraw(model, glm::vec3(0.2f, 4.0f, 48.0f), glm::vec3(200.0f, 0.41f, 0.0f), modelLoc, VAO_Cubo, armTextureID);//pared de enfrente
 		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(160.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de pinguino derecha
 		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(120.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de foca derecha
-		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(77.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de delf�n derecha*/
+		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(77.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de delfín derecha*/
 
 
 
-		lightingShader.Use(); // shader de iluminaci�n 
+		lightingShader.Use(); // shader de iluminación 
 		// -------------------------------------------------------------------------------- -
-	// 							DIBUJO DE MODELO JER�RQUICO (BRAZO)
+	// 							DIBUJO DE MODELO JERÁRQUICO (BRAZO)
 	// ---------------------------------------------------------------------------------
 		//// Textura
 		//// (Asumimos que la textura difusa va en la unidad 0)
@@ -763,8 +1049,8 @@ int main()
 
 		//glBindVertexArray(VAO_Cubo); // Usa el VAO del cubo
 
-		//// Habilitar los atributos (Ubicaci�n 0 y 1 ya est�n habilitadas por defecto)
-		//glEnableVertexAttribArray(0); // Posici�n
+		//// Habilitar los atributos (Ubicación 0 y 1 ya están habilitadas por defecto)
+		//glEnableVertexAttribArray(0); // Posición
 		//glEnableVertexAttribArray(1); // Normal
 		//glEnableVertexAttribArray(2); //Habilitar Coordenadas de Textura
 
@@ -824,7 +1110,7 @@ int main()
 
 
 
-// --- Funci�n para configurar los parametros del piso de textura repetible ---
+// --- Función para configurar los parametros del piso de textura repetible ---
 void ConfigurarTexturaRepetible(GLuint textureID)
 {
 	glBindTexture(GL_TEXTURE_2D, textureID);
@@ -837,7 +1123,7 @@ void ConfigurarTexturaRepetible(GLuint textureID)
 
 
 
-// --- Funci�n para dibujar pisos con textura ---
+// --- Función para dibujar pisos con textura ---
 void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc)
 {
 	// Activar y enlazar la textura
@@ -850,11 +1136,11 @@ void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint 
 	glBindVertexArray(VAO_Cubo);
 
 	// Habilitar los atributos necesarios
-	glEnableVertexAttribArray(0); // Posici�n
+	glEnableVertexAttribArray(0); // Posición
 	glEnableVertexAttribArray(1); // Normal
 	glEnableVertexAttribArray(2); // TexCoords
 
-	// Crear matriz de transformaci�n para el piso
+	// Crear matriz de transformación para el piso
 	glm::mat4 model_piso = glm::mat4(1.0f);
 	model_piso = glm::translate(model_piso, posicion);
 	model_piso = glm::scale(model_piso, escala);
@@ -947,6 +1233,50 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
+
+	// Activa la animación del pinguino con la tecla 'C'
+	if (key == GLFW_KEY_C && action == GLFW_PRESS && !teclaC_presionada)
+	{
+		animarPinguino = true;
+		startTimePinguino = glfwGetTime(); // Guarda el tiempo de inicio
+		teclaC_presionada = true; // Evita que se reinicie si se deja presionada
+	}
+	// Opcional: Detener animación con 'V'
+	if (key == GLFW_KEY_V && action == GLFW_PRESS)
+	{
+		animarPinguino = false;
+		teclaC_presionada = false; // Permite volver a iniciar
+		PinAlaIzq = 0.0f; // Resetea posición
+		PinAlaDer = 0.0f; // Resetea posición
+	}
+
+
+	if (key == GLFW_KEY_B && action == GLFW_PRESS && !teclaB_presionada)
+	{
+		animarFoca = true;
+		startTimeFoca = glfwGetTime(); // Guarda el tiempo de inicio
+		teclaB_presionada = true; // Evita que se reinicie si se deja presionada
+	}
+	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+	{
+		animarFoca = false;
+		teclaB_presionada = false; // Permite volver a iniciar
+	}
+
+	// Activa la animación del Delfin con la tecla 'X'
+	if (key == GLFW_KEY_X && action == GLFW_PRESS && !teclaD_presionada)
+	{
+		animarDelfin = true;
+		startTimeDelfin = glfwGetTime(); // Guarda el tiempo de inicio
+		teclaD_presionada = true; // Evita que se reinicie si se deja presionada
+	}
+	// Opcional: Detener animación con 'Z'
+	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+	{
+		animarDelfin = false;
+		teclaD_presionada = false; // Permite volver a iniciar
+	}
+
 }
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
