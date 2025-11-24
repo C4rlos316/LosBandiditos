@@ -123,6 +123,41 @@ bool teclaD_presionada = false; // Usaremos 'X' para activarlo
 //  DESIERTO (-X,Z)
 // -----------------------------------------
 
+// CAMELLO ( -X, Z)
+float rotCamel = 180.0f;
+float camelLegFL = 0.0f;
+float camelLegFR = 0.0f;
+float camelLegBL = 0.0f;
+float camelLegBR = 0.0f;
+float camelHead = 0.0f;
+float camelTail = 0.0f;
+float camelScale = 0.65f;
+glm::vec3 camelPos = glm::vec3(-4.0f, -0.5f, 10.0f);
+bool animarCamello = false;
+float startTimeCamello = 0.0f;
+bool teclaM_presionada = false;
+
+
+// TORTUGA ( -X, Z)
+float rotTortuga = 0.0f;
+float tortugaLegFL = 0.0f;
+float tortugaLegFR = 0.0f;
+float tortugaScale = 0.20f;
+glm::vec3 tortugaPos = glm::vec3(-7.8f, -0.18f, 9.5f);
+bool animarTortuga = false;
+float startTimeTortuga = 0.0f;
+bool teclaX_presionada = false;
+
+//  CÓNDOR (Cuadrante -X, Z)
+float rotCondor = 90.0f;
+float condorHead = 0.0f;
+float condorAlaIzq = 0.0f;
+float condorAlaDer = 0.0f;
+float condorScale = 0.70f;
+glm::vec3 condorPos = glm::vec3(-6.7f, 0.5f, 6.0f);
+bool animarCondor = false;
+bool teclaZ_presionada = false;
+
 
 
 // Vértices del cubo CON COORDENADAS DE TEXTURA
@@ -1067,15 +1102,171 @@ int main()
 
 
 
-		// ---------------------------------------------------------------------------------
-		// 							DIBUJO DE MODELOS DESIERTO (-x,z)
-		// ---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
+	// 							DIBUJO DE MODELOS DESIERTO (-x,z)
+	// ---------------------------------------------------------------------------------
 
-		// **** DIBUJO DEL PISO DESIERTO  Y COMPONENTES ****
+	// **** DIBUJO DEL PISO DESIERTO  Y COMPONENTES ****
 
 		DibujarPiso(pisoArenaTextureID, glm::vec3(-7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
 
+		// --- OASIS ---
+		model = glm::mat4(1);
+		model = glm::translate(model, oasisPos);
+		model = glm::scale(model, oasisScale);
+		model = glm::rotate(model, glm::radians(oasisRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Oasis.Draw(lightingShader);
+
+		// --- HUESOS ---
+		model = glm::mat4(1);
+		model = glm::translate(model, huesosPos);
+		model = glm::scale(model, huesosScale);
+		model = glm::rotate(model, glm::radians(huesosRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Huesos.Draw(lightingShader);
+
+		// --- TRONCO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, troncoPos);
+		model = glm::scale(model, troncoScale);
+		model = glm::rotate(model, glm::radians(troncoRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Tronco.Draw(lightingShader);
+
+		// --- CACTUS ---
+		model = glm::mat4(1);
+		model = glm::translate(model, cactusPos);
+		model = glm::scale(model, cactusScale);
+		model = glm::rotate(model, glm::radians(cactusRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cactus.Draw(lightingShader);
+
 		// **** DIBUJO DE ANIMALES DESIERTO ****
+
+		//CAMELLO
+
+
+
+		// DIBUJO DEL CAMELLO
+		model = glm::mat4(1);
+		model = glm::translate(model, camelPos);
+		model = glm::rotate(model, glm::radians(rotCamel), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(camelScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CamelBody.Draw(lightingShader);
+
+		// Cabeza
+		model = modelTemp;
+		model = glm::rotate(model, glm::radians(camelHead), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CamelHead.Draw(lightingShader);
+
+		// Pierna delantera izquierda
+		glm::vec3 camelPivotFL(0.3f, 1.2f, 0.5f);
+		model = modelTemp;
+		model = glm::translate(model, camelPivotFL);
+		model = glm::rotate(model, glm::radians(camelLegFL), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -camelPivotFL);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CamelLeg_FL.Draw(lightingShader);
+
+		// Pierna delantera derecha
+		glm::vec3 camelPivotFR(-0.3f, 1.2f, 0.5f);
+		model = modelTemp;
+		model = glm::translate(model, camelPivotFR);
+		model = glm::rotate(model, glm::radians(camelLegFR), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -camelPivotFR);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CamelLeg_FR.Draw(lightingShader);
+
+		// Pierna trasera izquierda
+		glm::vec3 camelPivotBL(0.3f, 1.2f, -0.5f);
+		model = modelTemp;
+		model = glm::translate(model, camelPivotBL);
+		model = glm::rotate(model, glm::radians(camelLegBL), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -camelPivotBL);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CamelLeg_BL.Draw(lightingShader);
+
+		// Pierna trasera derecha
+		glm::vec3 camelPivotBR(-0.3f, 1.2f, -0.5f);
+		model = modelTemp;
+		model = glm::translate(model, camelPivotBR);
+		model = glm::rotate(model, glm::radians(camelLegBR), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -camelPivotBR);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CamelLeg_BR.Draw(lightingShader);
+
+
+
+		//CONDOR
+
+
+
+		// Cuerpo condor
+		model = glm::mat4(1);
+		model = glm::translate(model, condorPos);
+		model = glm::rotate(model, glm::radians(rotCondor), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(condorScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CondorBody.Draw(lightingShader);
+
+		// Cabeza
+		model = modelTemp;
+		model = glm::rotate(model, glm::radians(condorHead), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CondorHead.Draw(lightingShader);
+
+		// Ala izquierda
+		glm::vec3 condorPivotAlaIzq(0.5f, 0.5f, 0.0f);
+		model = modelTemp;
+		model = glm::translate(model, condorPivotAlaIzq);
+		model = glm::rotate(model, glm::radians(condorAlaIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -condorPivotAlaIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CondorAla_Izq.Draw(lightingShader);
+
+		// Ala derecha
+		glm::vec3 condorPivotAlaDer(-0.5f, 0.5f, 0.0f);
+		model = modelTemp;
+		model = glm::translate(model, condorPivotAlaDer);
+		model = glm::rotate(model, glm::radians(condorAlaDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -condorPivotAlaDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CondorAla_Der.Draw(lightingShader);
+
+		//TORTUGA - ANIMACIÓN
+
+
+		//Cuerpo tortuga desierto
+		model = glm::mat4(1);
+		model = glm::translate(model, tortugaPos);
+		model = glm::rotate(model, glm::radians(rotTortuga), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(tortugaScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		TortugaBody1.Draw(lightingShader);
+
+		// Pata delantera izquierda
+		glm::vec3 tortugaPivotFL(0.2f, 0.0f, 0.2f);
+		model = modelTemp;
+		model = glm::translate(model, tortugaPivotFL);
+		model = glm::rotate(model, glm::radians(tortugaLegFL), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -tortugaPivotFL);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		TortugaLeg_FL1.Draw(lightingShader);
+
+		// Pata delantera derecha
+		glm::vec3 tortugaPivotFR(-0.2f, 0.0f, 0.2f);
+		model = modelTemp;
+		model = glm::translate(model, tortugaPivotFR);
+		model = glm::rotate(model, glm::radians(tortugaLegFR), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -tortugaPivotFR);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		TortugaLeg_FR1.Draw(lightingShader);
 
 
 		/*lightingShader.Use();
