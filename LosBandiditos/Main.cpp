@@ -24,6 +24,9 @@
 #include "Camera.h"
 #include "Model.h"
 
+//Skybox
+#include "Texture.h"
+
 
 // Funciones prototipo para callbacks
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -35,6 +38,7 @@ void DoMovement();
 // 	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
 // =================================================================================
 //Configurar funciones para repetir textura de piso
+void ConfigurarVAO(GLuint& VAO, GLuint& VBO, float* vertices, size_t size);
 void ConfigurarTexturaRepetible(GLuint textureID);
 void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc);
 
@@ -330,9 +334,64 @@ int main()
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 
+	
+	/*
+	================================================================================
+	CARGA DE SHADERS Y MODELOS 3D
+	================================================================================
 
+	SHADERS:
+	- lightingShader: Shader principal con modelo de iluminación Phong
+	- lampShader: Shader simplificado para objetos emisores de luz
+	- skyboxShader: Shader especializado para cubemap ambiental
+	*/
+
+	// Cargar shaders
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
+
+	Shader skyboxShader("Shader/skybox.vs", "Shader/skybox.frag");
+
+	// Vértices de cubo del skybox
+	float skyboxVertices[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
 
 	// =================================================================================
 	// 						CARGA DE MODELOS - Acuario (X,-Z)
@@ -479,60 +538,40 @@ int main()
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
 	// =================================================================================
-		// 					CONFIGURACIÓN DE VÉRTICES PARA PRIMITIVAS (CUBO)
-		// =================================================================================
+	// 		CONFIGURACIÓN DE VÉRTICES PARA PISO GENERAL
+	// =================================================================================
 	GLuint VBO_Cubo, VAO_Cubo;
-	glGenVertexArrays(1, &VAO_Cubo);
-	glGenBuffers(1, &VBO_Cubo);
-	glBindVertexArray(VAO_Cubo);
+	ConfigurarVAO(VAO_Cubo, VBO_Cubo, vertices, sizeof(vertices));
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_Cubo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindVertexArray(VAO_Cubo); // Enlazar el VAO
-
-	// Atributo de Posición (Location 0)
-	// El Stride (paso) ahora es de 8 floats
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-
-	// Atributo de Normal (Location 1)
-	// El Stride es 8, el Offset (desplazamiento) es después de los 3 floats de posición
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	// *** NUEVO: Atributo de Coordenadas de Textura (Location 2) ***
-	// El Stride es 8, el Offset es después de 3 (pos) + 3 (norm) = 6 floats
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0); // Desvincular el VAO
 
 
 	// =================================================================================
 	// 		CONFIGURACIÓN DE VÉRTICES PARA PISO DE ENTRADA
 	// =================================================================================
 	GLuint VBO_Entrada, VAO_Entrada;
-	glGenVertexArrays(1, &VAO_Entrada);
-	glGenBuffers(1, &VBO_Entrada);
-	glBindVertexArray(VAO_Entrada);
+	ConfigurarVAO(VAO_Entrada, VBO_Entrada, vertices, sizeof(vertices));
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_Entrada);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Atributo de Posición (Location 0)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	//SKYBOX
+	GLuint skyboxVBO, skyboxVAO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
-	// Atributo de Normal (Location 1)
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	// Atributo de Coordenadas de Textura (Location 2)
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0); // Desvincular el VAO
+	// Cargar las 6 caras del cubo del skybox
+	vector <const GLchar*> faces;
+	faces.push_back("images/skybox/right.jpg");
+	faces.push_back("images/skybox/left.jpg");
+	faces.push_back("images/skybox/top.jpg");
+	faces.push_back("images/skybox/bottom.jpg");
+	faces.push_back("images/skybox/back.jpg");
+	faces.push_back("images/skybox/front.jpg");
+	GLuint cubeMapTexture = TextureLoading::LoadCubemap(faces);
 
 
 	// =================================================================================
@@ -1438,6 +1477,24 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 
+		// ========================================================================
+		//								DIBUJAR SKYBOX
+		// ========================================================================
+
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.Use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
+
+		//Desenlazar la textura del skybox
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
 	}
@@ -1451,6 +1508,31 @@ int main()
 	return 0;
 }
 
+
+// --- Función para configurar VAO/VBO genérico ---
+void ConfigurarVAO(GLuint& VAO, GLuint& VBO, float* vertices, size_t size)
+{
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+
+	// Atributo de Posición (Location 0)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Atributo de Normal (Location 1)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	// Atributo de Coordenadas de Textura (Location 2)
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
+}
 
 
 // --- Función para configurar los parametros del piso de textura repetible ---
