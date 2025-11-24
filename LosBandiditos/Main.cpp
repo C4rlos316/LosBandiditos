@@ -108,6 +108,23 @@ bool animarDelfin = false;
 float startTimeDelfin = 0.0f;
 bool teclaD_presionada = false; // Usaremos 'X' para activarlo
 
+
+// -----------------------------------------
+//  SELVA (X,Z)
+// -----------------------------------------
+
+
+// -----------------------------------------
+//  SABANA (-X,-Z)
+// -----------------------------------------
+
+
+// -----------------------------------------
+//  DESIERTO (-X,Z)
+// -----------------------------------------
+
+
+
 // Vértices del cubo CON COORDENADAS DE TEXTURA
 float vertices[] = {
 	// Posiciones           // Normales           // Coordenadas de Textura (U, V)
@@ -319,7 +336,50 @@ int main()
 	// 						CARGA DE MODELOS - DESIERTO (-X,Z)
 	// =================================================================================
 
+	std::cout << "Cargando modelos desierto..." << std::endl;
+	// ====== ESCENARIO ======
+	Model Oasis((char*)"Models/oasis/oasis.obj");
+	glm::vec3 oasisPos(-9.5f, -0.64f, 9.5f);
+	glm::vec3 oasisScale(20.0f, 20.0f, 20.0f);
+	float oasisRot = 270.0f;
 
+	Model Huesos((char*)"Models/huesos/huesos.obj");
+	glm::vec3 huesosPos(-8.5f, -0.6f, 4.0f);
+	glm::vec3 huesosScale(0.3f, 0.25f, 0.25f);
+	float huesosRot = 90.0f;
+
+	Model Tronco((char*)"Models/tronco/tronco.obj");
+	glm::vec3 troncoPos(-6.8f, -0.5f, 6.0f);
+	glm::vec3 troncoScale(0.7f, 0.7f, 0.7f);
+	float troncoRot = 0.0f;
+
+
+	Model Cactus((char*)"Models/cactus/Cactus.obj");
+	glm::vec3 cactusPos(-4.0f, -0.5f, 3.7f);
+	glm::vec3 cactusScale(0.04f, 0.04f, 0.04f);
+	float cactusRot = 0.0f;
+
+	// ====== CAMELLO ======
+	Model CamelBody((char*)"Models/camello/CamelBody.obj");
+	Model CamelHead((char*)"Models/camello/CamelCabeza.obj");
+	Model CamelLeg_FL((char*)"Models/camello/CamelPataizqEnfr.obj");
+	Model CamelLeg_FR((char*)"Models/camello/CamelPataEnfreDer.obj");
+	Model CamelLeg_BL((char*)"Models/camello/CamelPataizqAtras.obj");
+	Model CamelLeg_BR((char*)"Models/camello/CamelPataAtrasDer.obj");
+
+	// ====== TORTUGA ======
+	Model TortugaBody1((char*)"Models/tortuga/tortuga_cuerpo.obj");
+	Model TortugaLeg_FL1((char*)"Models/tortuga/tortuga_pata_izq.obj");
+	Model TortugaLeg_FR1((char*)"Models/tortuga/tortuga_pata_der.obj");
+
+
+	// ====== CÓNDOR ======
+	Model CondorBody((char*)"Models/condor/condor_cuerpo.obj");
+	Model CondorHead((char*)"Models/condor/condor_cabeza.obj");
+	Model CondorAla_Der((char*)"Models/condor/condor_ala_der.obj");
+	Model CondorAla_Izq((char*)"Models/condor/condor_ala_izq.obj");
+
+	std::cout << "Modelos cargados desierto!" << std::endl;
 
 	// =================================================================================
 	// 						CARGA DE MODELOS - Sabana (-X,-Z)
