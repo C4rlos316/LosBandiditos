@@ -156,7 +156,7 @@ float condorAlaDer = 0.0f;
 float condorScale = 0.70f;
 glm::vec3 condorPos = glm::vec3(-6.7f, 0.5f, 6.0f);
 bool animarCondor = false;
-bool teclaZ_presionada = false;
+bool teclaQ_presionada = false;
 
 
 
@@ -1102,11 +1102,11 @@ int main()
 
 
 
-// ---------------------------------------------------------------------------------
-	// 							DIBUJO DE MODELOS DESIERTO (-x,z)
-	// ---------------------------------------------------------------------------------
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE MODELOS DESIERTO (-x,z)
+		// ---------------------------------------------------------------------------------
 
-	// **** DIBUJO DEL PISO DESIERTO  Y COMPONENTES ****
+		// **** DIBUJO DEL PISO DESIERTO  Y COMPONENTES ****
 
 		DibujarPiso(pisoArenaTextureID, glm::vec3(-7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
 
@@ -1146,6 +1146,54 @@ int main()
 
 		//CAMELLO
 
+		if (animarCamello)
+		{
+			float t = glfwGetTime() - startTimeCamello;
+
+			// CAMINANDO HACIA EL CACTUS
+			if (t < 8.0f)
+			{
+				// Movimiento de avance 
+				float totalDist = 10.0f - 5.0f;
+				camelPos.z = 10.0f - (t * (totalDist / 8.0f));
+
+				// Movimiento de patas
+				float paso = sin(t * 2.0f);
+				camelLegFL = paso * 15.0f;  // pata frontal izq
+				camelLegBR = paso * 15.0f;  // pata trasera der
+				camelLegFR = -paso * 15.0f; // pata frontal der (opuesta)
+				camelLegBL = -paso * 15.0f; // pata trasera izq (opuesta)
+
+				// Cabeza 
+				camelHead = sin(t * 0.5f) * 1.3f;
+				rotCamel = 180.0f;
+			}
+
+			// LLEGA AL CACTUS
+			else if (t < 14.0f)
+			{
+				float t2 = t - 8.0f;
+				camelPos.z = 5.0f; // está en el cactus 
+
+				// Detiene patas
+				camelLegFL = sin(t2 * 1.0f) * 5.0f;
+				camelLegFR = -camelLegFL;
+				camelLegBL = -camelLegFR;
+				camelLegBR = camelLegFR;
+
+				// Movimiento de cabeza
+				camelHead = abs(sin(t2 * 1.5f)) * 2.9f;
+				rotCamel = 180.0f;
+			}
+
+			else
+			{
+				camelPos.z = 5.0f;
+				camelHead = 0.0f;
+				camelLegFL = camelLegFR = camelLegBL = camelLegBR = 0.0f;
+				rotCamel = 180.0f;
+			}
+		}
 
 
 		// DIBUJO DEL CAMELLO
@@ -1203,7 +1251,13 @@ int main()
 
 		//CONDOR
 
-
+		if (animarCondor) {
+			float t = glfwGetTime();
+			condorAlaIzq = sin(t * 10.0f) * 1.5f;
+			condorAlaDer = -condorAlaIzq;
+			condorHead = sin(t * 8.0f) * 1.0f;
+			condorPos.y = 0.7f + sin(t * 0.8f) * 0.15f;
+		}
 
 		// Cuerpo condor
 		model = glm::mat4(1);
@@ -1240,6 +1294,44 @@ int main()
 
 		//TORTUGA - ANIMACIÓN
 
+		if (animarTortuga)
+		{
+			float t = glfwGetTime() - startTimeTortuga; // tiempo de animación
+
+			//Camina hacia el agua
+			if (t < 2.5f)
+			{
+				tortugaPos.x = -7.8f - (t * 0.08f);
+				tortugaPos.y = -0.18f;
+				rotTortuga = 0.0f;
+				tortugaScale = 0.20f;
+			}
+			//Empieza a sumergirse
+			else if (t < 6.0f)
+			{
+				float t2 = t - 2.5f;
+				tortugaPos.x = -8.0f - (t2 * 0.4f);    // avanza en el agua 
+				tortugaPos.y = -0.18f - (t2 * 0.07f);  // baja más suave
+				tortugaScale = 0.20f - (t2 * 0.012f);  // se achica 
+				rotTortuga = sin(t2 * 0.5f) * 5.0f;
+			}
+			//Sale del agua
+			else if (t < 9.0f)
+			{
+				float t3 = t - 6.0f;
+				tortugaPos.x = -9.4f - (t3 * 0.7f);
+				tortugaPos.y = -0.425f + (t3 * 0.0483f);
+				tortugaScale = 0.19f + (t3 * 0.0033f);
+				rotTortuga = t3 * 60.0f;
+			}
+			//gira
+			else {
+				tortugaPos.x = -11.5f;
+				tortugaPos.y = -0.28f;
+				tortugaScale = 0.20f;
+				rotTortuga = 180.0f;
+			}
+		}
 
 		//Cuerpo tortuga desierto
 		model = glm::mat4(1);
@@ -1483,6 +1575,42 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		{
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
+	}
+
+
+	// ANMALES DESIERTO
+
+	//CAMELLO(Tecla C)
+	if (keys[GLFW_KEY_M]) {
+		if (!teclaM_presionada) {
+			animarCamello = !animarCamello;
+			startTimeCamello = glfwGetTime();
+			teclaM_presionada = true;
+		}
+	}
+	else {
+		teclaM_presionada = false;
+	}
+	//CONDOR(Tecla Z)
+	if (keys[GLFW_KEY_Q]) {
+		if (!teclaQ_presionada) {
+			animarCondor = !animarCondor;
+			teclaQ_presionada = true;
+		}
+	}
+	else {
+		teclaQ_presionada = false;
+	}
+	//TORTUGA(Tecla X)
+	if (keys[GLFW_KEY_X]) {
+		if (!teclaX_presionada) {
+			animarTortuga = !animarTortuga;
+			startTimeTortuga = glfwGetTime();
+			teclaX_presionada = true;
+		}
+	}
+	else {
+		teclaX_presionada = false;
 	}
 
 	// Activa la animación del pinguino con la tecla 'C'
