@@ -27,6 +27,8 @@
 //Skybox
 #include "Texture.h"
 
+//Mixamo
+#include "modelAnim.h"
 
 // Funciones prototipo para callbacks
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -75,6 +77,13 @@ glm::vec3 pointLightPositions[] = {
 // 						ANIMACIÓN Y POSICIONES BASE DE ANIMALES
 // =================================================================================
 
+// -----------------------------------------
+//  PERSONAJE MIXAMO (CENTRO)
+// -----------------------------------------
+
+float personajeMixamoScale = 0.005f;
+float rotPersonajeMixamo = 180.0f;
+glm::vec3 personajeMixamoPos = glm::vec3(0.0f, -0.5f, 5.0f);
 
 //		Pinguino (Cuadrante X, -Z)
 float PinAlaIzq = 0.0f;
@@ -352,6 +361,10 @@ int main()
 
 	Shader skyboxShader("Shader/skybox.vs", "Shader/skybox.frag");
 
+	// Animaciones Mixamo
+	Shader animShader("Shader/anim.vs", "Shader/anim.fs");
+
+
 	// Vértices de cubo del skybox
 	float skyboxVertices[] = {
 		-1.0f,  1.0f, -1.0f,
@@ -392,6 +405,11 @@ int main()
 		 1.0f, -1.0f,  1.0f
 	};
 
+	// =================================================================================
+	// 						CARGA DE MODELO de MIXAMO o FBX
+	// =================================================================================
+	ModelAnim animacionPersonaje((char*)"Models/Personaje1/Arm.dae");
+	animacionPersonaje.initShaders(animShader.Program);
 
 	// =================================================================================
 	// 						CARGA DE MODELOS - Acuario (X,-Z)
@@ -782,6 +800,36 @@ int main()
 		// DIBUJO DEL PASTO ENTRADA
 		DibujarPiso(pisoEntradaID, glm::vec3(0.0f, -0.5f, 17.5f), glm::vec3(25.0f, 0.1f, 10.0f), VAO_Cubo, modelLoc);
 
+	// =================================================================================
+	// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
+	// =================================================================================
+
+	// ========== ACTIVAR SHADER DE ANIMACIÓN (UNA SOLA VEZ) ==========
+		animShader.Use();
+
+		// Configurar matrices de proyección y vista
+		glm::mat4 projectionAnim = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 viewAnim = camera.GetViewMatrix();
+
+		animShader.setMat4("projection", projectionAnim);
+		animShader.setMat4("view", viewAnim);
+
+		// Configurar iluminación para TODOS los personajes Mixamo
+		animShader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		animShader.setFloat("material.shininess", 32.0f);
+		animShader.setVec3("light.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+		animShader.setVec3("light.diffuse", glm::vec3(0.7f, 0.7f, 0.7f));
+		animShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		animShader.setVec3("light.direction", glm::vec3(-0.4f, -1.0f, -0.2f));
+		animShader.setVec3("viewPos", camera.GetPosition());
+
+		// ========== PERSONAJE 1: BAILARÍN (CENTRO) ==========
+		glm::mat4 modelAnim1 = glm::mat4(1.0f);
+		modelAnim1 = glm::translate(modelAnim1, personajeMixamoPos);
+		modelAnim1 = glm::rotate(modelAnim1, glm::radians(rotPersonajeMixamo), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelAnim1 = glm::scale(modelAnim1, glm::vec3(personajeMixamoScale));
+		animShader.setMat4("model", modelAnim1);
+		animacionPersonaje.Draw(animShader); // Dibujar personaje 1
 
 
 	// ---------------------------------------------------------------------------------

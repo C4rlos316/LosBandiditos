@@ -7,6 +7,8 @@
 #include <iostream>
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Shader
 {
@@ -14,7 +16,7 @@ public:
 	GLuint Program;
 	GLuint uniformColor;
 	// Constructor generates the shader on the fly
-	Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
+	Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	{
 		// 1. Retrieve the vertex/fragment source code from filePath
 		std::string vertexCode;
@@ -44,8 +46,8 @@ public:
 		{
 			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 		}
-		const GLchar *vShaderCode = vertexCode.c_str();
-		const GLchar *fShaderCode = fragmentCode.c_str();
+		const GLchar* vShaderCode = vertexCode.c_str();
+		const GLchar* fShaderCode = fragmentCode.c_str();
 		// 2. Compile shaders
 		GLuint vertex, fragment;
 		GLint success;
@@ -100,6 +102,46 @@ public:
 	GLuint getColorLocation()
 	{
 		return uniformColor;
+	}
+
+	// ========================================================================
+	// MÉTODOS ADICIONALES PARA ANIMACIONES MIXAMO
+	// ========================================================================
+
+	// Establece un valor int en el shader
+	void setInt(const std::string& name, int value) const
+	{
+		glUniform1i(glGetUniformLocation(Program, name.c_str()), value);
+	}
+
+	// Establece un valor float en el shader
+	void setFloat(const std::string& name, float value) const
+	{
+		glUniform1f(glGetUniformLocation(Program, name.c_str()), value);
+	}
+
+	// Establece un vector vec3 en el shader
+	void setVec3(const std::string& name, const glm::vec3& value) const
+	{
+		glUniform3fv(glGetUniformLocation(Program, name.c_str()), 1, &value[0]);
+	}
+
+	// Sobrecarga para vec3 con valores individuales
+	void setVec3(const std::string& name, float x, float y, float z) const
+	{
+		glUniform3f(glGetUniformLocation(Program, name.c_str()), x, y, z);
+	}
+
+	// Establece una matriz mat4 en el shader
+	void setMat4(const std::string& name, const glm::mat4& mat) const
+	{
+		glUniformMatrix4fv(glGetUniformLocation(Program, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+	}
+
+	// Método alternativo compatible con la sintaxis antigua
+	void use()
+	{
+		glUseProgram(this->Program);
 	}
 };
 
