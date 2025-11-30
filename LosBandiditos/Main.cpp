@@ -831,6 +831,8 @@ int main()
 		animShader.setMat4("model", modelAnim1);
 		animacionPersonaje.Draw(animShader); // Dibujar personaje 1
 
+		// ========== VOLVER AL SHADER DE ILUMINACIÓN ==========
+		lightingShader.Use();
 
 	// ---------------------------------------------------------------------------------
 	// 							DIBUJO DE ESCENARIO ACUARIO
