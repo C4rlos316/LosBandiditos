@@ -126,6 +126,42 @@ bool teclaD_presionada = false; // Usaremos 'X' para activarlo
 //  SELVA (X,Z)
 // -----------------------------------------
 
+// CAPIBARA ( X, Z)
+float capibaraScale = 1.0f;
+float rotCapibara = 180.0f;
+float capibaraCabezaRot = 0.0f;
+float capibaraNaranjaRot = 0.0f;
+float capibaraPataDelDer = 0.0f;
+float capibaraPataDelIzq = 0.0f;
+float capibaraPataTrasDer = 0.0f;
+float capibaraPataTrasIzq = 0.0f;
+glm::vec3 capibaraPos = glm::vec3(11.0f, 0.0f, 8.0f);
+bool animarCapibara = false;
+float startTimeCapibara = 0.0f;
+bool teclaP_presionada = false;
+
+//  MONO ( X, Z)
+float monoScale = 1.0f;
+float rotMono = 180.0f;
+float monoColaRot = 0.0f;
+float monoPataDelDer = 0.0f;
+float monoPataDelIzq = 0.0f;
+float monoPataTrasDer = 0.0f;
+float monoPataTrasIzq = 0.0f;
+glm::vec3 monoPos = glm::vec3(11.0f, 0.0f, 11.0f);
+bool animarMono = false;
+float startTimeMono = 0.0f;
+bool teclaN_presionada = false;
+
+// GUACAMAYA ( X, Z)
+float guacamayaScale = 1.0f;
+float rotGuacamaya = 270.0f;
+float guacamayaAlaDer = 0.0f;
+float guacamayaAlaIzq = 0.0f;
+glm::vec3 guacamayaPos = glm::vec3(11.1f, 1.55f, 6.5f);
+bool animarGuacamaya = false;
+float startTimeGuacamaya = 0.0f;
+bool teclaO_presionada = false;
 
 // -----------------------------------------
 //  SABANA (-X,-Z)
@@ -441,8 +477,108 @@ int main()
 	// 						CARGA DE MODELOS - Selva (X,Z)
 	// =================================================================================
 
+	std::cout << "Cargando modelos selva..." << std::endl;
 
+	// ====== ESCENARIO ======
+	Model ArbolSelva((char*)"Models/arbolSelva/arbolSelva.obj");
+	glm::vec3 arbolSelvaPos(11.0f, -0.5f, 3.1f);
+	glm::vec3 arbolSelvaScale(0.2f, 0.2f, 0.2f);
+	float arbolSelvaRot = 0.0f;
 
+	Model Sandia((char*)"Models/sandia/sandia.obj");
+	glm::vec3 sandiaPos(3.0f, -0.2f, 8.0f);
+	glm::vec3 sandiaScale(1.0f, 1.0f, 1.0f);
+	float sandiaRot = 180.0f;
+
+	Model TroncoSelva1((char*)"Models/troncoSelva/troncoSelva.obj");
+	glm::vec3 troncoSelva1Pos(10.0f, -0.2f, 11.0f);
+	glm::vec3 troncoSelva1Scale(1.0f, 0.7f, 1.0f);
+	float troncoSelva1Rot = 0.0f;
+
+	Model TroncoSelva2((char*)"Models/troncoSelva/troncoSelva.obj");
+	glm::vec3 troncoSelva2Pos(5.5f, -0.2f, 11.0f);
+	glm::vec3 troncoSelva2Scale(1.0f, 0.5f, 1.0f);
+	float troncoSelva2Rot = 0.0f;
+
+	Model Pelota((char*)"Models/pelota/pelota.obj");
+	glm::vec3 pelotaPos(5.5f, -0.2f, 11.0f);
+	glm::vec3 pelotaScale(0.5f, 0.5f, 0.5f);
+	float pelotaRot = 0.0f;
+
+	Model Platano1((char*)"Models/platano/platano.obj");
+	glm::vec3 platano1Pos(11.0f, -0.4f, 11.8f);
+	glm::vec3 platano1Scale(5.0f, 5.0f, 5.0f);
+	float platano1Rot = 0.0f;
+
+	Model Platano2((char*)"Models/platano/platano.obj");
+	glm::vec3 platano2Pos(7.6f, -0.4f, 9.8f);
+	glm::vec3 platano2Scale(5.0f, 5.0f, 5.0f);
+	float platano2Rot = 0.0f;
+
+	Model Gato((char*)"Models/platano/gato.obj");
+	glm::vec3 gatoPos(3.2f, 0.0f, 11.9f);
+	glm::vec3 gatoScale(0.8f, 0.8f, 0.8f);
+	float gatoRot = 90.0f;
+
+	Model ArbolRama((char*)"Models/arbolRama/arbolRama.obj");
+	glm::vec3 arbolRamaPos(11.0f, 0.6f, 6.0f);
+	glm::vec3 arbolRamaScale(2.5f, 2.5f, 2.5f);
+	float arbolRamaRot = 0.0f;
+
+	Model RamaSelva((char*)"Models/ramaSelva/ramaSelva.obj");
+	glm::vec3 ramaSelvaPos(3.0f, 0.15f, 6.0f);
+	glm::vec3 ramaSelvaScale(2.5f, 2.5f, 4.0f);
+	float ramaSelvaRot = 0.0f;
+
+	Model PlantaSelva1((char*)"Models/plantaSelva/planta_selva.obj");
+	glm::vec3 plantaSelva1Pos(8.5f, -0.3f, 3.1f);
+	glm::vec3 plantaSelva1Scale(0.4f, 0.4f, 0.4f);
+	float plantaSelva1Rot = 0.0f;
+	glm::vec3 plantaSelva3Pos(-3.8f, -0.3f, -3.1f);
+
+	Model PlantaSelva2((char*)"Models/plantaSelva/planta_selva.obj");
+	glm::vec3 plantaSelva2Pos(11.0f, -0.3f, 9.5f);
+	glm::vec3 plantaSelva2Scale(0.4f, 0.4f, 0.4f);
+	float plantaSelva2Rot = 0.0f;
+
+	Model Loto1((char*)"Models/loto/loto.obj");
+	glm::vec3 loto1Pos(6.5f, -0.21f, 3.1f);
+	glm::vec3 loto1Scale(1.0f, 1.0f, 1.0f);
+	float loto1Rot = 0.0f;
+
+	Model Loto2((char*)"Models/loto/loto.obj");
+	glm::vec3 loto2Pos(5.0f, -0.21f, 3.1f);
+	glm::vec3 loto2Scale(1.0f, 1.0f, 1.0f);
+	float loto2Rot = 0.0f;
+
+	Model Loto3((char*)"Models/loto/loto.obj");
+	glm::vec3 loto3Pos(3.5f, -0.21f, 3.1f);
+	glm::vec3 loto3Scale(1.0f, 1.0f, 1.0f);
+	float loto3Rot = 0.0f;
+
+	// ====== CAPIBARA ======
+	Model Capibara_Cabeza((char*)"Models/capibara/cabezaCapi.obj");
+	Model Capibara_Cuerpo((char*)"Models/capibara/cuerpoCapi.obj");
+	Model Capibara_Naranja((char*)"Models/capibara/naranjaCapi.obj");
+	Model Capibara_PataDelDer((char*)"Models/capibara/pataDelDerCapi.obj");
+	Model Capibara_PataDelIzq((char*)"Models/capibara/pataDelIzqCapi.obj");
+	Model Capibara_PataTrasDer((char*)"Models/capibara/pataTrasDerCapi.obj");
+	Model Capibara_PataTrasIzq((char*)"Models/capibara/pataTrasIzqCapi.obj");
+
+	// ====== MONO ======
+	Model Mono_Cuerpo((char*)"Models/mono/cuerpoMono.obj");
+	Model Mono_Cola((char*)"Models/mono/colaMono.obj");
+	Model Mono_PataDelDer((char*)"Models/mono/pataDelDerMono.obj");
+	Model Mono_PataDelIzq((char*)"Models/mono/pataDelIzqMono.obj");
+	Model Mono_PataTrasDer((char*)"Models/mono/pataTasDerMono.obj");
+	Model Mono_PataTrasIzq((char*)"Models/mono/pataTrasIzqMono.obj");
+
+	// ====== GUACAMAYA ======
+	Model Ave_Cuerpo((char*)"Models/aveSelva/cuerpoAve.obj");
+	Model Ave_AlaDer((char*)"Models/aveSelva/alaDerAve.obj");
+	Model Ave_AlaIzq((char*)"Models/aveSelva/alaIzqAve.obj");
+
+	std::cout << "Modelos cargados selva!" << std::endl;
 
 	// =================================================================================
 	// 						CARGA DE MODELOS - DESIERTO (-X,Z)
@@ -519,7 +655,7 @@ int main()
 	ConfigurarTexturaRepetible(pisoAcuarioTextureID);
 
 	// *** TEXTURA PARA EL PISO SELVA ***
-	GLuint pisoSelvaTextureID = TextureFromFile("images/selva.jpg", ".");
+	GLuint pisoSelvaTextureID = TextureFromFile("images/selva.png", ".");
 	ConfigurarTexturaRepetible(pisoSelvaTextureID);
 
 	// *** TEXTURA PARA EL PISO SABANA ***
@@ -1168,15 +1304,474 @@ int main()
 		// --- FIN PINGUINO ---
 
 
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE MODELOS SABANA (x,z)
+		// ---------------------------------------------------------------------------------
+		
 		// **** DIBUJO DEL PISO SELVA Y ACCESORIOS SELVA ****
 		DibujarPiso(pisoSelvaTextureID, glm::vec3(7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+		// --- ÁRBOL ---
+		model = glm::mat4(1);
+		model = glm::translate(model, arbolSelvaPos);
+		model = glm::scale(model, arbolSelvaScale);
+		model = glm::rotate(model, glm::radians(arbolSelvaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ArbolSelva.Draw(lightingShader);
 
+		// --- SANDÍA ---
+		model = glm::mat4(1);
+		model = glm::translate(model, sandiaPos);
+		model = glm::scale(model, sandiaScale);
+		model = glm::rotate(model, glm::radians(sandiaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Sandia.Draw(lightingShader);
 
+		// --- TRONCO 1 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, troncoSelva1Pos);
+		model = glm::scale(model, troncoSelva1Scale);
+		model = glm::rotate(model, glm::radians(troncoSelva1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		TroncoSelva1.Draw(lightingShader);
 
+		// --- PELOTA ---
+		model = glm::mat4(1);
+		model = glm::translate(model, pelotaPos);
+		model = glm::scale(model, pelotaScale);
+		model = glm::rotate(model, glm::radians(pelotaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Pelota.Draw(lightingShader);
 
-		// **** DIBUJO DE ANIMALES SELVA ****
+		// --- PLATANO 1 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, platano1Pos);
+		model = glm::scale(model, platano1Scale);
+		model = glm::rotate(model, glm::radians(platano1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Platano1.Draw(lightingShader);
 
+		// --- PLATANO 2 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, platano2Pos);
+		model = glm::scale(model, platano2Scale);
+		model = glm::rotate(model, glm::radians(platano2Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Platano2.Draw(lightingShader);
 
+		// --- GATO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, gatoPos);
+		model = glm::scale(model, gatoScale);
+		model = glm::rotate(model, glm::radians(gatoRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Gato.Draw(lightingShader);
+
+		// --- ÁRBOL MUERTO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, arbolRamaPos);
+		model = glm::scale(model, arbolRamaScale);
+		model = glm::rotate(model, glm::radians(arbolRamaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ArbolRama.Draw(lightingShader);
+
+		// --- RAMA ---
+		model = glm::mat4(1);
+		model = glm::translate(model, ramaSelvaPos);
+		model = glm::scale(model, ramaSelvaScale);
+		model = glm::rotate(model, glm::radians(ramaSelvaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		RamaSelva.Draw(lightingShader);
+
+		//--- PLANTA 1 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, plantaSelva1Pos);
+		model = glm::scale(model, plantaSelva1Scale);
+		model = glm::rotate(model, glm::radians(plantaSelva1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PlantaSelva1.Draw(lightingShader);
+
+		//--- PLANTA 2 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, plantaSelva2Pos);
+		model = glm::scale(model, plantaSelva2Scale);
+		model = glm::rotate(model, glm::radians(plantaSelva2Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PlantaSelva2.Draw(lightingShader);
+
+		// --- LOTO 1 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, loto1Pos);
+		model = glm::scale(model, loto1Scale);
+		model = glm::rotate(model, glm::radians(loto1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Loto1.Draw(lightingShader);
+
+		// --- LOTO 2 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, loto2Pos);
+		model = glm::scale(model, loto2Scale);
+		model = glm::rotate(model, glm::radians(loto2Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Loto2.Draw(lightingShader);
+
+		// --- LOTO 3 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, loto3Pos);
+		model = glm::scale(model, loto3Scale);
+		model = glm::rotate(model, glm::radians(loto3Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Loto3.Draw(lightingShader);
+
+		// **** DIBUJO DEL CAPIBARA ****
+		model = glm::mat4(1);
+		model = glm::translate(model, capibaraPos);
+		model = glm::rotate(model, glm::radians(rotCapibara), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(capibaraScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_Cuerpo.Draw(lightingShader);
+
+		// Cabeza
+		glm::vec3 capibaraPivotCabeza(0.0f, 0.5f, 0.4f);
+		model = modelTemp;
+		model = glm::translate(model, capibaraPivotCabeza);
+		model = glm::rotate(model, glm::radians(capibaraCabezaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, -capibaraPivotCabeza);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_Cabeza.Draw(lightingShader);
+
+		// Pata delantera derecha
+		glm::vec3 capibaraPivotPataDelDer(0.2f, 0.3f, 0.3f);
+		model = modelTemp;
+		model = glm::translate(model, capibaraPivotPataDelDer);
+		model = glm::rotate(model, glm::radians(capibaraPataDelDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -capibaraPivotPataDelDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_PataDelDer.Draw(lightingShader);
+
+		// Pata delantera izquierda
+		glm::vec3 capibaraPivotPataDelIzq(-0.2f, 0.3f, 0.3f);
+		model = modelTemp;
+		model = glm::translate(model, capibaraPivotPataDelIzq);
+		model = glm::rotate(model, glm::radians(capibaraPataDelIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -capibaraPivotPataDelIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_PataDelIzq.Draw(lightingShader);
+
+		// Pata trasera derecha
+		glm::vec3 capibaraPivotPataTrasDer(0.2f, 0.3f, -0.3f);
+		model = modelTemp;
+		model = glm::translate(model, capibaraPivotPataTrasDer);
+		model = glm::rotate(model, glm::radians(capibaraPataTrasDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -capibaraPivotPataTrasDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_PataTrasDer.Draw(lightingShader);
+
+		// Pata trasera izquierda
+		glm::vec3 capibaraPivotPataTrasIzq(-0.2f, 0.3f, -0.3f);
+		model = modelTemp;
+		model = glm::translate(model, capibaraPivotPataTrasIzq);
+		model = glm::rotate(model, glm::radians(capibaraPataTrasIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -capibaraPivotPataTrasIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_PataTrasIzq.Draw(lightingShader);
+
+		// Naranja
+		glm::vec3 capibaraPivotNaranja(0.0f, 0.0f, 0.0f);
+		model = modelTemp;
+		model = glm::translate(model, capibaraPivotNaranja);
+		model = glm::rotate(model, glm::radians(capibaraNaranjaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, -capibaraPivotNaranja);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Capibara_Naranja.Draw(lightingShader);
+
+		// CAPIBARA - ANIMACIÓN
+		if (animarCapibara)
+		{
+			float t = glfwGetTime() - startTimeCapibara;
+
+			// FASE 1: CAMINANDO (10 segundos)
+			if (t < 10.0f)
+			{
+				float totalDist = 7.0f;
+				capibaraPos.x = 11.0f - (t * (totalDist / 10.0f));
+
+				// Movimiento de patas (caminata de cuadrúpedo)
+				float paso = sin(t * 6.0f);
+				capibaraPataDelDer = paso * 1.5f;
+				capibaraPataTrasDer = paso * 1.5f;
+				capibaraPataDelIzq = -paso * 1.5f;
+				capibaraPataTrasIzq = -paso * 1.5f;
+
+				// Naranja rotando mientras camina
+				capibaraNaranjaRot = t * 180.0f;
+
+				capibaraCabezaRot = 0.0f;
+				rotCapibara = 180.0f;
+			}
+			// FASE 2: DETENIDO, COMIENDO (6 segundos)
+			else if (t < 16.0f)
+			{
+				float t2 = t - 10.0f;
+				capibaraPos.x = 4.0f;
+
+				// Patas deteniéndose gradualmente
+				capibaraPataDelDer = sin(t2 * 0.5f) * 2.0f;
+				capibaraPataDelIzq = -capibaraPataDelDer;
+				capibaraPataTrasDer = -capibaraPataDelDer;
+				capibaraPataTrasIzq = capibaraPataDelDer;
+
+				// Naranja regresa a posición inicial
+				capibaraNaranjaRot = 1800.0f - (t2 * 300.0f);
+
+				capibaraCabezaRot = 0.0f;
+				rotCapibara = 180.0f;
+			}
+			// FASE 3: QUIETO
+			else
+			{
+				capibaraPos.x = 4.0f;
+				capibaraCabezaRot = 0.0f;
+				capibaraPataDelDer = capibaraPataDelIzq = 0.0f;
+				capibaraPataTrasDer = capibaraPataTrasIzq = 0.0f;
+				capibaraNaranjaRot = 0.0f;
+				rotCapibara = 180.0f;
+			}
+		}
+
+		// **** DIBUJO DEL MONO ****
+		model = glm::mat4(1);
+		model = glm::translate(model, monoPos);
+		model = glm::rotate(model, glm::radians(rotMono), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(monoScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Mono_Cuerpo.Draw(lightingShader);
+
+		// Cola
+		glm::vec3 monoPivotCola(0.0f, 0.5f, -0.4f);
+		model = modelTemp;
+		model = glm::translate(model, monoPivotCola);
+		model = glm::rotate(model, glm::radians(monoColaRot), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -monoPivotCola);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Mono_Cola.Draw(lightingShader);
+
+		// Pata delantera derecha
+		glm::vec3 monoPivotPataDelDer(0.2f, 0.3f, 0.3f);
+		model = modelTemp;
+		model = glm::translate(model, monoPivotPataDelDer);
+		model = glm::rotate(model, glm::radians(monoPataDelDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -monoPivotPataDelDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Mono_PataDelDer.Draw(lightingShader);
+
+		// Pata delantera izquierda
+		glm::vec3 monoPivotPataDelIzq(-0.2f, 0.3f, 0.3f);
+		model = modelTemp;
+		model = glm::translate(model, monoPivotPataDelIzq);
+		model = glm::rotate(model, glm::radians(monoPataDelIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -monoPivotPataDelIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Mono_PataDelIzq.Draw(lightingShader);
+
+		// Pata trasera derecha
+		glm::vec3 monoPivotPataTrasDer(0.2f, 0.3f, -0.3f);
+		model = modelTemp;
+		model = glm::translate(model, monoPivotPataTrasDer);
+		model = glm::rotate(model, glm::radians(monoPataTrasDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -monoPivotPataTrasDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Mono_PataTrasDer.Draw(lightingShader);
+
+		// Pata trasera izquierda
+		glm::vec3 monoPivotPataTrasIzq(-0.2f, 0.3f, -0.3f);
+		model = modelTemp;
+		model = glm::translate(model, monoPivotPataTrasIzq);
+		model = glm::rotate(model, glm::radians(monoPataTrasIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -monoPivotPataTrasIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Mono_PataTrasIzq.Draw(lightingShader);
+
+		// MONO - ANIMACIÓN
+		if (animarMono)
+		{
+			float t = glfwGetTime() - startTimeMono;
+
+			// FASE 1: PRIMER BRINCO (1.5 segundos)
+			if (t < 1.5f)
+			{
+				float saltoCiclo = abs(sin(t * 2.094f));
+				monoPos.y = 0.0f + (saltoCiclo * 1.0f);
+				monoPos.x = 11.0f - (t * 1.5f);
+
+				// Patas recogidas durante el salto
+				monoPataDelDer = saltoCiclo * 8.0f;
+				monoPataDelIzq = saltoCiclo * 8.0f;
+				monoPataTrasDer = saltoCiclo * 8.0f;
+				monoPataTrasIzq = saltoCiclo * 8.0f;
+
+				// Cola levantada durante el salto
+				monoColaRot = 2.0f + (saltoCiclo * 1.5f);
+				rotMono = 180.0f;
+			}
+			// PAUSA 1: ATERRIZA (0.2 segundos)
+			else if (t < 1.7f)
+			{
+				monoPos.y = 0.0f;
+				monoPos.x = 8.75f;
+				monoPataDelDer = monoPataDelIzq = 0.0f;
+				monoPataTrasDer = monoPataTrasIzq = 0.0f;
+				monoColaRot = 0.5f;
+				rotMono = 180.0f;
+			}
+			// FASE 2: SEGUNDO BRINCO (1.5 segundos)
+			else if (t < 3.2f)
+			{
+				float t2 = t - 1.7f;
+				float saltoCiclo = abs(sin(t2 * 2.094f));
+				monoPos.y = 0.0f + (saltoCiclo * 1.0f);
+				monoPos.x = 8.75f - (t2 * 1.5f);
+
+				// Patas recogidas durante el salto
+				monoPataDelDer = saltoCiclo * 8.0f;
+				monoPataDelIzq = saltoCiclo * 8.0f;
+				monoPataTrasDer = saltoCiclo * 8.0f;
+				monoPataTrasIzq = saltoCiclo * 8.0f;
+
+				// Cola levantada durante el salto
+				monoColaRot = 2.0f + (saltoCiclo * 1.5f);
+				rotMono = 180.0f;
+			}
+			// PAUSA 2: ATERRIZA (0.2 segundos)
+			else if (t < 3.4f)
+			{
+				monoPos.y = 0.0f;
+				monoPos.x = 6.5f;
+				monoPataDelDer = monoPataDelIzq = 0.0f;
+				monoPataTrasDer = monoPataTrasIzq = 0.0f;
+				monoColaRot = 0.5f;
+				rotMono = 180.0f;
+			}
+			// FASE 3: TERCER BRINCO (1.5 segundos)
+			else if (t < 4.9f)
+			{
+				float t3 = t - 3.4f;
+				float saltoCiclo = abs(sin(t3 * 2.094f));
+				monoPos.y = 0.0f + (saltoCiclo * 1.0f);
+				monoPos.x = 6.5f - (t3 * 1.5f);
+
+				// Patas recogidas durante el salto
+				monoPataDelDer = saltoCiclo * 8.0f;
+				monoPataDelIzq = saltoCiclo * 8.0f;
+				monoPataTrasDer = saltoCiclo * 8.0f;
+				monoPataTrasIzq = saltoCiclo * 8.0f;
+
+				// Cola levantada durante el salto
+				monoColaRot = 2.0f + (saltoCiclo * 1.5f);
+				rotMono = 180.0f;
+			}
+			// FASE 4: CAMINANDO (1 segundo)
+			else if (t < 5.9f)
+			{
+				float t4 = t - 4.9f;
+				monoPos.y = 0.0f;
+				monoPos.x = 4.25f - (t4 * 1.0f);
+
+				// Movimiento de patas (caminata de cuadrúpedo)
+				float paso = sin(t4 * 6.0f);
+				monoPataDelDer = paso * 2.0f;
+				monoPataTrasDer = paso * 2.0f;
+				monoPataDelIzq = -paso * 2.0f;
+				monoPataTrasIzq = -paso * 2.0f;
+
+				// Cola moviéndose mientras camina
+				monoColaRot = sin(t4 * 2.0f) * 2.0f;
+				rotMono = 180.0f;
+			}
+			// FASE 5: QUIETO
+
+			else
+			{
+				monoPos.x = 3.f;
+				monoPos.y = 0.0f;
+				monoColaRot = 0.0f;
+				monoPataDelDer = monoPataDelIzq = 0.0f;
+				monoPataTrasDer = monoPataTrasIzq = 0.0f;
+				rotMono = 180.0f;
+			}
+		}
+
+		// **** DIBUJO DE LA GUACAMAYA ****
+		model = glm::mat4(1);
+		model = glm::translate(model, guacamayaPos);
+		model = glm::rotate(model, glm::radians(rotGuacamaya), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(guacamayaScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Ave_Cuerpo.Draw(lightingShader);
+
+		// Ala derecha
+		glm::vec3 guacamayaPivotAlaDer(0.3f, 0.0f, 0.0f);
+		model = modelTemp;
+		model = glm::translate(model, guacamayaPivotAlaDer);
+		model = glm::rotate(model, glm::radians(guacamayaAlaDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -guacamayaPivotAlaDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Ave_AlaDer.Draw(lightingShader);
+
+		// Ala izquierda
+		glm::vec3 guacamayaPivotAlaIzq(-0.3f, 0.0f, 0.0f);
+		model = modelTemp;
+		model = glm::translate(model, guacamayaPivotAlaIzq);
+		model = glm::rotate(model, glm::radians(guacamayaAlaIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, -guacamayaPivotAlaIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Ave_AlaIzq.Draw(lightingShader);
+
+		// GUACAMAYA - ANIMACIÓN
+		if (animarGuacamaya)
+		{
+			float t = glfwGetTime() - startTimeGuacamaya;
+
+			// FASE 1: Volando (8 segundos)
+			if (t < 8.0f)
+			{
+				// Vuelo en línea recta
+				guacamayaPos.x = 11.1f - (t * 1.0f);
+				guacamayaPos.y = 1.55f;
+				guacamayaPos.z = 6.5f;
+
+				// Aleteo suave
+				float aleteo = sin(t * 2.5f);
+				guacamayaAlaDer = aleteo * 5.0f;
+				guacamayaAlaIzq = -aleteo * 5.0f;
+				rotGuacamaya = 270.0f;
+			}
+			// FASE 2: Descendiendo hacia la rama (4 segundos)
+			else if (t < 12.0f)
+			{
+				float t2 = t - 8.0f;
+				guacamayaPos.x = 3.1f - (t2 * 0.025f);
+				guacamayaPos.y = 1.55f - (t2 * 0.2625f);
+				guacamayaPos.z = 6.5f;
+
+				// Alas casi quietas al planear
+				guacamayaAlaDer = 3.0f;
+				guacamayaAlaIzq = -3.0f;
+				rotGuacamaya = 270.0f;
+			}
+			// FASE 3: Posada en la rama
+			else
+			{
+				guacamayaPos.x = 3.0f;
+				guacamayaPos.y = 0.5f;
+				guacamayaPos.z = 6.5f;
+				guacamayaAlaDer = 0.0f;
+				guacamayaAlaIzq = 0.0f;
+				rotGuacamaya = 270.0f;
+			}
+		}
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE MODELOS SABANA (-x,-z)
@@ -1184,10 +1779,6 @@ int main()
 
 		// **** DIBUJO DEL PISO SABANA Y ACCESORIOS SABANA ****
 		DibujarPiso(pisoSabanaTextureID, glm::vec3(-7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
-
-
-
-		// **** DIBUJO DE ANIMALES SABANA ****
 
 
 
@@ -1743,6 +2334,51 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 	else {
 		teclaX_presionada = false;
+	}
+
+	//CAPIBARA (Tecla P)
+	if (keys[GLFW_KEY_P])
+	{
+		if (!teclaP_presionada) // Reutilizas la variable que ya tienes
+		{
+			animarCapibara = !animarCapibara;
+			startTimeCapibara = glfwGetTime();
+			teclaP_presionada = true;
+		}
+	}
+	else
+	{
+		teclaP_presionada = false;
+	}
+	 
+	//MONO (Tecla N)
+	if (keys[GLFW_KEY_N])
+	{
+		if (!teclaN_presionada)
+		{
+			animarMono = !animarMono;
+			startTimeMono = glfwGetTime();
+			teclaN_presionada = true;
+		}
+	}
+	else
+	{
+		teclaN_presionada = false;
+	}
+
+	//GUACAMAYA (Tecla O)
+	if (keys[GLFW_KEY_O])
+	{
+		if (!teclaO_presionada)
+		{
+			animarGuacamaya = !animarGuacamaya;
+			startTimeGuacamaya = glfwGetTime();
+			teclaO_presionada = true;
+		}
+	}
+	else
+	{
+		teclaO_presionada = false;
 	}
 
 	// Activa la animación del pinguino con la tecla 'C'
