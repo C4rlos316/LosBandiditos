@@ -219,7 +219,7 @@ glm::vec3 panda1Pos = glm::vec3(0.0f, -0.5f, 15.0f);
 
 
 
-// Vértices del cubo CON COORDENADAS DE TEXTURA
+// Vértices para el piso
 float vertices[] = {
 	// Posiciones           // Normales           // Coordenadas de Textura (U, V)
 	// Cara Trasera (-Z)
@@ -264,6 +264,66 @@ float vertices[] = {
 	  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  10.0f, 0.0f,
 	 -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
 	 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 10.0f
+};
+
+
+// Vértices para PAREDES 
+float verticesPared[] = {
+	//  Cara Trasera (-Z)
+	-0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 0.0f,  
+	 0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 1.0f,  
+	 0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 1.0f,  
+	-0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
+
+
+
+
+	//  Cara Frontal (+Z)
+	-0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f, 
+	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f, 
+	-0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
+
+
+	// Cara Izquierda (-X) 
+	-0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   20.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   20.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   20.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+
+
+
+	// Cara Derecha (+X)
+	0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   20.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   20.0f, 0.0f,
+	0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   20.0f, 0.0f,
+	0.5f, -0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+
+
+
+	 // Cara Inferior (-Y)
+	 -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
+	  0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 5.0f,
+	  0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 0.0f,
+	  0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 0.0f,
+	 -0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
+	 -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
+
+	 // Cara Superior (+Y)
+	 -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f,
+	  0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 5.0f,
+	  0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 0.0f,
+	  0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 0.0f,
+	 -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
+	 -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f
 };
 
 //glm::vec3 lampColors[] = {
@@ -674,15 +734,21 @@ int main()
 	// =================================================================================
 
 
-	// PARA ESTA PARTE YA HAY UNA FUNCION LA CUAL ES ConfigurarTexturaRepetible para que la usen
-	// y no tengan que poner todo el codigo repetido ConfigurarTexturaRepetible(variablePiso);
-
 	// ***TEXTURA GENERAL PARA EL PISO ***
 	GLuint pisoTextureID = TextureFromFile("images/ladrillo.png", ".");
 	ConfigurarTexturaRepetible(pisoTextureID);
 
+	// ***TEXTURA  PARA EL PISO ENTRADA ***
 	GLuint pisoEntradaID = TextureFromFile("images/pasto.jpg", ".");
 	ConfigurarTexturaRepetible(pisoEntradaID);
+
+	// *** TEXTURA PARA LAS PAREDES ***
+	GLuint paredTextureID = TextureFromFile("images/muro.jpg", ".");
+	ConfigurarTexturaRepetible(paredTextureID);
+	//Altura de la pared
+	float alturaPared = 3.0f;
+	// Escala general del área
+	float tamanoBase = 25.0f;
 
 	// *** TEXTURA PARA EL PISO ACUARIO ***
 	GLuint pisoAcuarioTextureID = TextureFromFile("images/textnieve.jpg", ".");
@@ -735,14 +801,18 @@ int main()
 	GLuint VBO_Cubo, VAO_Cubo;
 	ConfigurarVAO(VAO_Cubo, VBO_Cubo, vertices, sizeof(vertices));
 
-
-
-
 	// =================================================================================
 	// 		CONFIGURACIÓN DE VÉRTICES PARA PISO DE ENTRADA
 	// =================================================================================
 	GLuint VBO_Entrada, VAO_Entrada;
 	ConfigurarVAO(VAO_Entrada, VBO_Entrada, vertices, sizeof(vertices));
+
+
+	// =================================================================================
+	// 		CONFIGURACIÓN DE VÉRTICES PARA PAREDES
+	// =================================================================================
+	GLuint VBO_Pared, VAO_Pared;
+	ConfigurarVAO(VAO_Pared, VBO_Pared, verticesPared, sizeof(verticesPared));
 
 
 	//SKYBOX
@@ -975,14 +1045,45 @@ int main()
 		DibujarPiso(pisoEntradaID, glm::vec3(0.0f, -0.5f, 17.5f), glm::vec3(25.0f, 0.1f, 10.0f), VAO_Cubo, modelLoc);
 
 		// *** DIBUJO DEL PISO FONDO ***
-		DibujarPiso(pisoTextureID, glm::vec3(0.0f, -0.5f, -17.5f), glm::vec3(25.0f, 0.1f, 27.0f), VAO_Cubo, modelLoc);
+		DibujarPiso(pisoTextureID, glm::vec3(0.0f, -0.5f, -17.5f), glm::vec3(25.0f, 0.1f, 32.0f), VAO_Cubo, modelLoc);
 
 
-	// =================================================================================
-	// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
-	// =================================================================================
+		// =================================================================================
+		// 							DIBUJO DE PAREDES
+		// =================================================================================
 
-	// ========== ACTIVAR SHADER DE ANIMACIÓN es una sola vez para todos los personajes ==========
+		//  Pared trasera (Z negativa) - EXTENDIDA HASTA EL HÁBITAT DE PANDAS
+		DibujarPiso(paredTextureID, glm::vec3(0.0f, alturaPared / 2 - 0.5f, -33.5f),
+			glm::vec3(tamanoBase, alturaPared, 0.2f), VAO_Pared, modelLoc);
+
+
+		// Pared izquierda (X negativa)
+		DibujarPiso(paredTextureID, glm::vec3(-tamanoBase / 2, alturaPared / 2 - 0.5f, -10.25f),
+			glm::vec3(0.2f, alturaPared, 46.3f), VAO_Pared, modelLoc);
+
+		// Pared derecha (X positiva)
+		DibujarPiso(paredTextureID, glm::vec3(tamanoBase / 2, alturaPared / 2 - 0.5f, -10.25f),
+			glm::vec3(0.2f, alturaPared, 46.3), VAO_Pared, modelLoc);
+
+		//// Pared de entrada - Lado IZQUIERDO
+		//DibujarPiso(paredTextureID, glm::vec3(-7.15f, alturaPared / 2 - 0.5f, 12.5f),
+		//	glm::vec3(10.50f, alturaPared, 0.2f), VAO_Pared, modelLoc);
+
+		//// Pared de entrada - Lado DERECHO
+		//DibujarPiso(paredTextureID, glm::vec3(7.15f, alturaPared / 2 - 0.5f, 12.5f),
+		//	glm::vec3(10.50f, alturaPared, 0.2f), VAO_Pared, modelLoc);
+
+		// =================================================================================
+		// 							DIBUJO DE MODELOS - ENTRADA
+		// =================================================================================
+
+
+
+		// =================================================================================
+		// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
+		// =================================================================================
+
+		// ========== ACTIVAR SHADER DE ANIMACIÓN es una sola vez para todos los personajes ==========
 		animShader.Use();
 
 		// Configurar matrices de proyección y vista
@@ -1040,7 +1141,7 @@ int main()
 		// ---------------------------------------------------------------------------------
 
 		//// DIBUJO PISO HABITAT DE PANDAS ***
-		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -19.5f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
+		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -21.0f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
 
 	// ---------------------------------------------------------------------------------
