@@ -208,6 +208,16 @@ bool animarCondor = false;
 bool teclaQ_presionada = false;
 
 
+// -----------------------------------------
+//  Habitat Pandas
+// -----------------------------------------
+
+// PANDA 1 
+float panda1Scale = 0.005f;
+float rotPanda1 = 180.0f;
+glm::vec3 panda1Pos = glm::vec3(0.0f, -0.5f, 15.0f);
+
+
 
 // Vértices del cubo CON COORDENADAS DE TEXTURA
 float vertices[] = {
@@ -442,10 +452,34 @@ int main()
 	};
 
 	// =================================================================================
-	// 						CARGA DE MODELO de MIXAMO o FBX
+	// 						CARGA DE MODELO que sean de FBX hay que usar estas funciones
+	//								sino no funcionan las animaciones
+	//								ModelAnim y .initShaders(animShader.Program);
 	// =================================================================================
 	ModelAnim animacionPersonaje((char*)"Models/Personaje1/Arm.dae");
 	animacionPersonaje.initShaders(animShader.Program);
+
+	// =================================================================================
+	// 						CARGA DE MODELO para Habitat de  PANDAS si es FBX 
+	// =================================================================================
+
+	std::cout << "Cargando modelos habitat pandas..." << std::endl;
+
+	// ====== ESCENARIO ======
+
+
+	// ====== PANDA1 ======
+	ModelAnim animacionPanda1((char*)"Models/Personaje1/Arm.dae");
+	animacionPanda1.initShaders(animShader.Program);
+
+	//// ====== PANDA2 ======
+	//ModelAnim animacionPanda2((char*)"Models/Personaje1/Arm.fbx");
+	//animacionPanda2.initShaders(animShader.Program);
+
+
+
+	std::cout << "Modelos cargados habitat pandas!" << std::endl;
+
 
 	// =================================================================================
 	// 						CARGA DE MODELOS - Acuario (X,-Z)
@@ -665,6 +699,10 @@ int main()
 	// *** TEXTURA PARA EL PISO DESIERTO ***
 	GLuint pisoArenaTextureID = TextureFromFile("images/sand.jpg", ".");
 	ConfigurarTexturaRepetible(pisoArenaTextureID);
+
+	// *** TEXTURA PARA EL HÁBITAT DE PANDAS ***
+	GLuint pisoPandasTextureID = TextureFromFile("images/sand.jpg", ".");
+	ConfigurarTexturaRepetible(pisoPandasTextureID);
 
 
 	// =================================================================================
@@ -936,11 +974,15 @@ int main()
 		// DIBUJO DEL PASTO ENTRADA
 		DibujarPiso(pisoEntradaID, glm::vec3(0.0f, -0.5f, 17.5f), glm::vec3(25.0f, 0.1f, 10.0f), VAO_Cubo, modelLoc);
 
+		// *** DIBUJO DEL PISO FONDO ***
+		DibujarPiso(pisoTextureID, glm::vec3(0.0f, -0.5f, -17.5f), glm::vec3(25.0f, 0.1f, 27.0f), VAO_Cubo, modelLoc);
+
+
 	// =================================================================================
 	// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
 	// =================================================================================
 
-	// ========== ACTIVAR SHADER DE ANIMACIÓN (UNA SOLA VEZ) ==========
+	// ========== ACTIVAR SHADER DE ANIMACIÓN es una sola vez para todos los personajes ==========
 		animShader.Use();
 
 		// Configurar matrices de proyección y vista
@@ -959,16 +1001,47 @@ int main()
 		animShader.setVec3("light.direction", glm::vec3(-0.4f, -1.0f, -0.2f));
 		animShader.setVec3("viewPos", camera.GetPosition());
 
-		// ========== PERSONAJE 1: BAILARÍN (CENTRO) ==========
+		// ========== PERSONAJE 1: BAILARÍN ==========
 		glm::mat4 modelAnim1 = glm::mat4(1.0f);
 		modelAnim1 = glm::translate(modelAnim1, personajeMixamoPos);
 		modelAnim1 = glm::rotate(modelAnim1, glm::radians(rotPersonajeMixamo), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelAnim1 = glm::scale(modelAnim1, glm::vec3(personajeMixamoScale));
 		animShader.setMat4("model", modelAnim1);
-		animacionPersonaje.Draw(animShader); // Dibujar personaje 1
+		animacionPersonaje.Draw(animShader); 
 
-		// ========== VOLVER AL SHADER DE ILUMINACIÓN ==========
+
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE PANDAS
+		// ---------------------------------------------------------------------------------
+
+		// ========== EJEMPLO PANDA 1: ==========
+		//glm::mat4 panda1 = glm::mat4(1.0f);
+		//panda1 = glm::translate(panda1, panda1Pos);
+		//panda1 = glm::rotate(panda1, glm::radians(rotPanda1), glm::vec3(0.0f, 1.0f, 0.0f));
+		//panda1 = glm::scale(panda1, glm::vec3(panda1Scale));
+		//animShader.setMat4("model", panda1);
+		//animacionPanda1.Draw(animShader); 
+
+
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE CAMELLO
+		// ---------------------------------------------------------------------------------
+
+
+
+
+		// ========== VOLVER AL SHADER DE ILUMINACIÓN esto se deja hasta el final siempre ==========
 		lightingShader.Use();
+
+
+
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE ESCENARIO HABITAT PANDAS
+		// ---------------------------------------------------------------------------------
+
+		//// DIBUJO PISO HABITAT DE PANDAS ***
+		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -19.5f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
+
 
 	// ---------------------------------------------------------------------------------
 	// 							DIBUJO DE ESCENARIO ACUARIO
