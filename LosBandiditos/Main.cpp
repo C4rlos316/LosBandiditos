@@ -173,18 +173,17 @@ bool teclaO_presionada = false;
 // -----------------------------------------
 
 // CAMELLO ( -X, Z)
-float rotCamel = 180.0f;
-float camelLegFL = 0.0f;
-float camelLegFR = 0.0f;
-float camelLegBL = 0.0f;
-float camelLegBR = 0.0f;
-float camelHead = 0.0f;
-float camelTail = 0.0f;
-float camelScale = 0.65f;
-glm::vec3 camelPos = glm::vec3(-4.0f, -0.5f, 10.0f);
-bool animarCamello = false;
-float startTimeCamello = 0.0f;
-bool teclaM_presionada = false;
+
+float camelloScale = 0.002f;
+float rotCamello = 180.0f;
+glm::vec3 camelloPos = glm::vec3(-4.0f, -0.5f, 10.0f);
+glm::vec3 camelloPosActual = camelloPos;
+bool animarCamelloFBX = true;
+float startTimeCamelloFBX = 0.0f;
+const float CAMELLO_FPS = 30.0f;  
+const int CAMELLO_FRAME_WALK_END = 200; 
+const int CAMELLO_FRAME_TOTAL = 306;
+const float CAMELLO_OFFSET_CACTUS = 1.2f;
 
 
 // TORTUGA ( -X, Z)
@@ -416,7 +415,7 @@ int main()
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto Final", nullptr, nullptr);
-
+	startTimeCamelloFBX = glfwGetTime();
 	if (nullptr == window)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -702,12 +701,10 @@ int main()
 	float cactusRot = 0.0f;
 
 	// ====== CAMELLO ======
-	Model CamelBody((char*)"Models/camello/CamelBody.obj");
-	Model CamelHead((char*)"Models/camello/CamelCabeza.obj");
-	Model CamelLeg_FL((char*)"Models/camello/CamelPataizqEnfr.obj");
-	Model CamelLeg_FR((char*)"Models/camello/CamelPataEnfreDer.obj");
-	Model CamelLeg_BL((char*)"Models/camello/CamelPataizqAtras.obj");
-	Model CamelLeg_BR((char*)"Models/camello/CamelPataAtrasDer.obj");
+
+	ModelAnim animacionCamello((char*)"Models/Camello1/camello.fbx");
+	animacionCamello.initShaders(animShader.Program);
+
 
 	// ====== TORTUGA ======
 	Model TortugaBody1((char*)"Models/tortuga/tortuga_cuerpo.obj");
@@ -746,7 +743,7 @@ int main()
 	GLuint paredTextureID = TextureFromFile("images/muro.jpg", ".");
 	ConfigurarTexturaRepetible(paredTextureID);
 	//Altura de la pared
-	float alturaPared = 3.0f;
+	float alturaPared = 1.9f;
 	// Escala general del área
 	float tamanoBase = 25.0f;
 
@@ -875,11 +872,10 @@ int main()
 
 
 		// Luz Direccional (dirLight)
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.6f, 0.6f, 0.6f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.6f, 0.6f, 0.6f);
-
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.3f, -0.7f, -0.4f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.4f, 0.4f, 0.45f);  //  MÁS BRILLANTE (era 0.05)
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.9f, 0.85f, 0.75f); //  Tono cálido (era 0.6)
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.8f, 0.8f, 0.7f);  //  Más brillo
 		// Luces Puntuales (pointLights) - Usando los colores de las lámparas
 		// Point light 1
 		glm::vec3 lightColor;
@@ -1065,13 +1061,13 @@ int main()
 		DibujarPiso(paredTextureID, glm::vec3(tamanoBase / 2, alturaPared / 2 - 0.5f, -10.25f),
 			glm::vec3(0.2f, alturaPared, 46.3), VAO_Pared, modelLoc);
 
-		//// Pared de entrada - Lado IZQUIERDO
-		//DibujarPiso(paredTextureID, glm::vec3(-7.15f, alturaPared / 2 - 0.5f, 12.5f),
-		//	glm::vec3(10.50f, alturaPared, 0.2f), VAO_Pared, modelLoc);
+		// Pared de entrada - Lado IZQUIERDO
+		DibujarPiso(paredTextureID, glm::vec3(-7.15f, alturaPared / 2 - 0.5f, 12.5f),
+			glm::vec3(10.50f, alturaPared, 0.2f), VAO_Pared, modelLoc);
 
-		//// Pared de entrada - Lado DERECHO
-		//DibujarPiso(paredTextureID, glm::vec3(7.15f, alturaPared / 2 - 0.5f, 12.5f),
-		//	glm::vec3(10.50f, alturaPared, 0.2f), VAO_Pared, modelLoc);
+		// Pared de entrada - Lado DERECHO
+		DibujarPiso(paredTextureID, glm::vec3(7.15f, alturaPared / 2 - 0.5f, 12.5f),
+			glm::vec3(10.50f, alturaPared, 0.2f), VAO_Pared, modelLoc);
 
 		// =================================================================================
 		// 							DIBUJO DE MODELOS - ENTRADA
@@ -1081,6 +1077,7 @@ int main()
 
 		// =================================================================================
 		// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
+		//				Aqui van todos los modelos fbx o dae con animaciones
 		// =================================================================================
 
 		// ========== ACTIVAR SHADER DE ANIMACIÓN es una sola vez para todos los personajes ==========
@@ -1127,7 +1124,12 @@ int main()
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE CAMELLO
 		// ---------------------------------------------------------------------------------
-
+		glm::mat4 camello1 = glm::mat4(1.0f);
+		camello1 = glm::translate(camello1, camelloPosActual); 
+		camello1 = glm::rotate(camello1, glm::radians(rotCamello), glm::vec3(0.0f, 1.0f, 0.0f));
+		camello1 = glm::scale(camello1, glm::vec3(camelloScale));
+		animShader.setMat4("model", camello1);
+		animacionCamello.Draw(animShader);
 
 
 
@@ -1998,113 +2000,52 @@ int main()
 
 		// **** DIBUJO DE ANIMALES DESIERTO ****
 
-		//CAMELLO
+		// =================================================================================
+		// 					ANIMACIÓN DEL CAMELLO 
+		// =================================================================================
 
-		if (animarCamello)
+		if (animarCamelloFBX)
 		{
-			float t = glfwGetTime() - startTimeCamello;
+			float t = glfwGetTime() - startTimeCamelloFBX;
 
-			// CAMINANDO HACIA EL CACTUS
-			if (t < 8.0f)
-			{
-				// Movimiento de avance 
-				float totalDist = 10.0f - 5.0f;
-				camelPos.z = 10.0f - (t * (totalDist / 8.0f));
-
-				// Movimiento de patas
-				float paso = sin(t * 2.0f);
-				camelLegFL = paso * 15.0f;  // pata frontal izq
-				camelLegBR = paso * 15.0f;  // pata trasera der
-				camelLegFR = -paso * 15.0f; // pata frontal der (opuesta)
-				camelLegBL = -paso * 15.0f; // pata trasera izq (opuesta)
-
-				// Cabeza 
-				camelHead = sin(t * 0.5f) * 1.3f;
-				rotCamel = 180.0f;
+			// --- Calcular frame actual de la animación ---
+			float frameActual = t * CAMELLO_FPS;
+			if (frameActual >= CAMELLO_FRAME_TOTAL){
+				startTimeCamelloFBX = glfwGetTime();
+				t = 0.0f;
+				frameActual = 0.0f;
 			}
 
-			// LLEGA AL CACTUS
-			else if (t < 14.0f)
+			// ---CAMINANDO
+			if (frameActual < CAMELLO_FRAME_WALK_END)
 			{
-				float t2 = t - 8.0f;
-				camelPos.z = 5.0f; // está en el cactus 
+				float phase = frameActual / CAMELLO_FRAME_WALK_END;
+				float targetZ = cactusPos.z + CAMELLO_OFFSET_CACTUS;
 
-				// Detiene patas
-				camelLegFL = sin(t2 * 1.0f) * 5.0f;
-				camelLegFR = -camelLegFL;
-				camelLegBL = -camelLegFR;
-				camelLegBR = camelLegFR;
+				camelloPosActual.x = camelloPos.x;
+				camelloPosActual.y = camelloPos.y;
+				camelloPosActual.z = glm::mix(
+					camelloPos.z,
+					targetZ,
+					phase
+				);
 
-				// Movimiento de cabeza
-				camelHead = abs(sin(t2 * 1.5f)) * 2.9f;
-				rotCamel = 180.0f;
+				rotCamello = 180.0f;
 			}
-
+			// COMIENDO ---
 			else
 			{
-				camelPos.z = 5.0f;
-				camelHead = 0.0f;
-				camelLegFL = camelLegFR = camelLegBL = camelLegBR = 0.0f;
-				rotCamel = 180.0f;
+				camelloPosActual.x = cactusPos.x;
+				camelloPosActual.y = camelloPos.y;
+				camelloPosActual.z = cactusPos.z + CAMELLO_OFFSET_CACTUS;
+				rotCamello = 180.0f;
 			}
 		}
-
-
-		// DIBUJO DEL CAMELLO
-		model = glm::mat4(1);
-		model = glm::translate(model, camelPos);
-		model = glm::rotate(model, glm::radians(rotCamel), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(camelScale));
-		modelTemp = model;
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		CamelBody.Draw(lightingShader);
-
-		// Cabeza
-		model = modelTemp;
-		model = glm::rotate(model, glm::radians(camelHead), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		CamelHead.Draw(lightingShader);
-
-		// Pierna delantera izquierda
-		glm::vec3 camelPivotFL(0.3f, 1.2f, 0.5f);
-		model = modelTemp;
-		model = glm::translate(model, camelPivotFL);
-		model = glm::rotate(model, glm::radians(camelLegFL), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::translate(model, -camelPivotFL);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		CamelLeg_FL.Draw(lightingShader);
-
-		// Pierna delantera derecha
-		glm::vec3 camelPivotFR(-0.3f, 1.2f, 0.5f);
-		model = modelTemp;
-		model = glm::translate(model, camelPivotFR);
-		model = glm::rotate(model, glm::radians(camelLegFR), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::translate(model, -camelPivotFR);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		CamelLeg_FR.Draw(lightingShader);
-
-		// Pierna trasera izquierda
-		glm::vec3 camelPivotBL(0.3f, 1.2f, -0.5f);
-		model = modelTemp;
-		model = glm::translate(model, camelPivotBL);
-		model = glm::rotate(model, glm::radians(camelLegBL), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::translate(model, -camelPivotBL);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		CamelLeg_BL.Draw(lightingShader);
-
-		// Pierna trasera derecha
-		glm::vec3 camelPivotBR(-0.3f, 1.2f, -0.5f);
-		model = modelTemp;
-		model = glm::translate(model, camelPivotBR);
-		model = glm::rotate(model, glm::radians(camelLegBR), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::translate(model, -camelPivotBR);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		CamelLeg_BR.Draw(lightingShader);
-
-
-
+		else{
+			camelloPosActual = camelloPos;
+		}
+		
 		//CONDOR
-
 		if (animarCondor) {
 			float t = glfwGetTime();
 			condorAlaIzq = sin(t * 10.0f) * 1.5f;
@@ -2474,20 +2415,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		}
 	}
 
-
-	// ANMALES DESIERTO
-
-	//CAMELLO(Tecla C)
-	if (keys[GLFW_KEY_M]) {
-		if (!teclaM_presionada) {
-			animarCamello = !animarCamello;
-			startTimeCamello = glfwGetTime();
-			teclaM_presionada = true;
-		}
-	}
-	else {
-		teclaM_presionada = false;
-	}
 	//CONDOR(Tecla Z)
 	if (keys[GLFW_KEY_Q]) {
 		if (!teclaQ_presionada) {
