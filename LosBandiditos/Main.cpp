@@ -526,7 +526,10 @@ int main()
 	std::cout << "Cargando modelos habitat pandas..." << std::endl;
 
 	// ====== ESCENARIO ======
-
+	Model PinoBosque((char*)"Models/arbolSelva/arbolSelva.obj");
+	glm::vec3 pinoBosquePos(11.0f, -0.5f, 3.1f);
+	glm::vec3 pinoBosqueScale(0.2f, 0.2f, 0.2f);
+	float pinoBosqueRot = 0.0f;
 
 	// ====== PANDA1 ======
 	ModelAnim animacionPanda1((char*)"Models/Personaje1/Arm.dae");
@@ -767,7 +770,7 @@ int main()
 	ConfigurarTexturaRepetible(pisoArenaTextureID);
 
 	// *** TEXTURA PARA EL HÁBITAT DE PANDAS ***
-	GLuint pisoPandasTextureID = TextureFromFile("images/sand.jpg", ".");
+	GLuint pisoPandasTextureID = TextureFromFile("images/bosque.png", ".");
 	ConfigurarTexturaRepetible(pisoPandasTextureID);
 
 
