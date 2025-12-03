@@ -167,6 +167,32 @@ bool teclaO_presionada = false;
 //  SABANA (-X,-Z)
 // -----------------------------------------
 
+//  ELEFANTE ( -X, -Z)
+float rotElefante = 90.0f;
+float rotElefanteLado = 0.0f;
+float elefanteLegFL = 0.0f;
+float elefanteLegFR = 0.0f;
+float elefanteLegBL = 0.0f;
+float elefanteLegBR = 0.0f;
+float elefanteTrompa = 0.0f;
+float elefanteScale = 0.50f;
+glm::vec3 elefantePos = glm::vec3(-9.0f, -0.4f, -10.5f);
+bool animarElefante = false;
+float startTimeElefante = 0.0f;
+bool teclaV_presionada = false;
+
+// CEBRA (-X,-Z) 
+float cebraScale = 0.027f;
+float rotCebra = 180.0f;
+float cebraPataDelDer = 0.0f;
+float cebraPataDelIzq = 0.0f;
+float cebraPataTrasDer = 0.0f;
+float cebraPataTrasIzq = 0.0f;
+glm::vec3 cebraPos = glm::vec3(-2.8f, -0.4f, -3.5f);
+bool animarCebra = false;
+float startTimeCebra = 0.0f;
+bool teclaL_presionada = false;
+
 
 // -----------------------------------------
 //  DESIERTO (-X,Z)
@@ -724,7 +750,34 @@ int main()
 	// 						CARGA DE MODELOS - Sabana (-X,-Z)
 	// =================================================================================
 
+	std::cout << "Cargando modelos sabana..." << std::endl;
 
+	// ====== ESCENARIO ======
+
+
+	// ROCA
+	Model Roca((char*)"Models/roca/roca.obj");
+	glm::vec3 RocaPos(-7.25f, -0.5f, -11.8f);
+	glm::vec3 RocaEScale(0.06f, 0.06f, 0.06f);
+	float RocaRot = 270.0f;
+
+
+	//ELEFANTE
+	Model ElefanteBody((char*)"Models/elefante/elefante_cuerpo.obj");
+	Model ElefanteTrompa((char*)"Models/elefante/elefante_trompa.obj");
+	Model ElefanteLeg_FL((char*)"Models/elefante/elefante_pata_izq_enfr.obj");
+	Model ElefanteLeg_FR((char*)"Models/elefante/elefante_pata_der_enfr.obj");
+	Model ElefanteLeg_BL((char*)"Models/elefante/elefante_pata_izq_atras.obj");
+	Model ElefanteLeg_BR((char*)"Models/elefante/elefante_pata_der_atras.obj");
+
+	//CEBRA
+	Model Cebra_Cuerpo((char*)"Models/cebra/cebra_cuerpo.obj");
+	Model Cebra_PataDelDer((char*)"Models/cebra/cebra_pata_der_enfr.obj");
+	Model Cebra_PataDelIzq((char*)"Models/cebra/cebra_pata_izq_enfr.obj");
+	Model Cebra_PataTrasDer((char*)"Models/cebra/cebra_pata_der_atras.obj");
+	Model Cebra_PataTrasIzq((char*)"Models/cebra/cebra_pata_izq_atras.obj");
+
+	std::cout << "Modelos cargados sabana!" << std::endl;
 
 	// =================================================================================
 	// 						Carga de Texturas para los pisos
@@ -1481,7 +1534,7 @@ int main()
 
 
 		// ---------------------------------------------------------------------------------
-		// 							DIBUJO DE MODELOS SABANA (x,z)
+		// 							DIBUJO DE MODELOS SELVA (x,z)
 		// ---------------------------------------------------------------------------------
 		
 		// **** DIBUJO DEL PISO SELVA Y ACCESORIOS SELVA ****
@@ -1957,6 +2010,349 @@ int main()
 		DibujarPiso(pisoSabanaTextureID, glm::vec3(-7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
 
 
+		// --- Roca  ---
+		model = glm::mat4(1);
+		model = glm::translate(model, RocaPos);
+		model = glm::scale(model, RocaEScale);
+		model = glm::rotate(model, glm::radians(RocaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Roca.Draw(lightingShader);
+
+		//// --- Arbol 2 ---
+		//model = glm::mat4(1);
+		//model = glm::translate(model, arbolSabanaPos2);
+		//model = glm::scale(model, arbolSabanaScale);
+		//model = glm::rotate(model, glm::radians(arbolSabanaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//ArbolSabana.Draw(lightingShader);
+
+		//--- PLANTA ---
+		model = glm::mat4(1);
+		model = glm::translate(model, plantaSelva3Pos);
+		model = glm::scale(model, plantaSelva1Scale);
+		model = glm::rotate(model, glm::radians(plantaSelva1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PlantaSelva1.Draw(lightingShader);
+
+
+		// **** DIBUJO DE ANIMALES SABANA ****
+
+		//ELEFANTE
+		model = glm::mat4(1);
+		model = glm::translate(model, elefantePos);
+		model = glm::rotate(model, glm::radians(rotElefante), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(rotElefanteLado), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(elefanteScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ElefanteBody.Draw(lightingShader);
+
+		// Trompa
+		glm::vec3 elefantePivotTrompa(0.0f, 1.0f, 0.5f);
+		model = modelTemp;
+		model = glm::translate(model, elefantePivotTrompa);
+		model = glm::rotate(model, glm::radians(elefanteTrompa), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -elefantePivotTrompa);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ElefanteTrompa.Draw(lightingShader);
+
+		// Pierna delantera izquierda
+		glm::vec3 elefantePivotFL(0.3f, 1.2f, 0.5f);
+		model = modelTemp;
+		model = glm::translate(model, elefantePivotFL);
+		model = glm::rotate(model, glm::radians(elefanteLegFL), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -elefantePivotFL);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ElefanteLeg_FL.Draw(lightingShader);
+
+		// Pierna delantera derecha
+		glm::vec3 elefantePivotFR(-0.3f, 1.2f, 0.5f);
+		model = modelTemp;
+		model = glm::translate(model, elefantePivotFR);
+		model = glm::rotate(model, glm::radians(elefanteLegFR), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -elefantePivotFR);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ElefanteLeg_FR.Draw(lightingShader);
+
+		// Pierna trasera izquierda
+		glm::vec3 elefantePivotBL(0.3f, 1.2f, -0.5f);
+		model = modelTemp;
+		model = glm::translate(model, elefantePivotBL);
+		model = glm::rotate(model, glm::radians(elefanteLegBL), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -elefantePivotBL);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ElefanteLeg_BL.Draw(lightingShader);
+
+		// Pierna trasera derecha
+		glm::vec3 elefantePivotBR(-0.3f, 1.2f, -0.5f);
+		model = modelTemp;
+		model = glm::translate(model, elefantePivotBR);
+		model = glm::rotate(model, glm::radians(elefanteLegBR), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -elefantePivotBR);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ElefanteLeg_BR.Draw(lightingShader);
+
+		//ELEFANTE - ANIMACIÓN
+
+		if (animarElefante)
+		{
+			float t = glfwGetTime() - startTimeElefante;
+
+			// CAMINANDO (0s - 8s)
+			if (t < 8.0f)
+			{
+
+				float totalDist = 3.0f;
+				elefantePos.x = -9.0f + (t * (totalDist / 8.0f));
+
+				// Movimiento de patas
+				float paso = sin(t * 2.0f);
+				elefanteLegFL = paso * 10.0f;
+				elefanteLegBR = paso * 15.0f;
+				elefanteLegFR = -paso * 10.0f;
+				elefanteLegBL = -paso * 15.0f;
+
+				// Trompa
+				elefanteTrompa = sin(t * 0.5f) * 5.0f;
+				rotElefante = 90.0f;
+				rotElefanteLado = 0.0f;
+				elefantePos.y = -0.4f;
+				elefantePos.z = -10.5f;
+			}
+
+			//SE ACUESTA DE LADO
+			else if (t < 12.0f)
+			{
+				float t2 = t - 8.0f;
+				elefantePos.x = -6.0f;
+				elefantePos.z = -10.5f;
+
+				// Rotación lateral
+				rotElefanteLado = t2 * 22.5f;
+				elefantePos.y = -0.4f + (t2 * 0.1f);
+
+				// Patas
+				elefanteLegFL = 0.0f;
+				elefanteLegFR = 0.0f;
+				elefanteLegBL = 0.0f;
+				elefanteLegBR = 0.0f;
+
+				// Trompa
+				elefanteTrompa = 5.0f - (t2 * 1.25f);
+				rotElefante = 90.0f;
+			}
+
+			// ACOSTADO DE LADO
+			else
+			{
+				elefantePos.x = -6.0f;
+				elefantePos.z = -10.5f;
+				elefantePos.y = 0.0f;
+				rotElefanteLado = 90.0f;
+
+				// Patas
+				elefanteLegFL = 0.0f;
+				elefanteLegFR = 0.0f;
+				elefanteLegBL = 0.0f;
+				elefanteLegBR = 0.0f;
+
+				// Respiración solo trompa
+				elefanteTrompa = sin(glfwGetTime() * 0.5f) * 2.0f;
+				rotElefante = 90.0f;
+			}
+		}
+
+		//CEBRA
+		model = glm::mat4(1);
+		model = glm::translate(model, cebraPos);
+		model = glm::rotate(model, glm::radians(rotCebra), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(cebraScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cebra_Cuerpo.Draw(lightingShader);
+
+		// Pata delantera derecha
+		glm::vec3 cebraPivotPataDelDer(0.3f, 0.8f, 0.4f);
+		model = modelTemp;
+		model = glm::translate(model, cebraPivotPataDelDer);
+		model = glm::rotate(model, glm::radians(cebraPataDelDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -cebraPivotPataDelDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cebra_PataDelDer.Draw(lightingShader);
+
+		// Pata delantera izquierda
+		glm::vec3 cebraPivotPataDelIzq(-0.3f, 0.8f, 0.4f);
+		model = modelTemp;
+		model = glm::translate(model, cebraPivotPataDelIzq);
+		model = glm::rotate(model, glm::radians(cebraPataDelIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -cebraPivotPataDelIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cebra_PataDelIzq.Draw(lightingShader);
+
+		// Pata trasera derecha
+		glm::vec3 cebraPivotPataTrasDer(0.3f, 0.8f, -0.4f);
+		model = modelTemp;
+		model = glm::translate(model, cebraPivotPataTrasDer);
+		model = glm::rotate(model, glm::radians(cebraPataTrasDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -cebraPivotPataTrasDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cebra_PataTrasDer.Draw(lightingShader);
+
+		// Pata trasera izquierda
+		glm::vec3 cebraPivotPataTrasIzq(-0.3f, 0.8f, -0.4f);
+		model = modelTemp;
+		model = glm::translate(model, cebraPivotPataTrasIzq);
+		model = glm::rotate(model, glm::radians(cebraPataTrasIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, -cebraPivotPataTrasIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Cebra_PataTrasIzq.Draw(lightingShader);
+
+
+		// CEBRA - ANIMACIÓN
+		if (animarCebra)
+		{
+			float t = glfwGetTime() - startTimeCebra;
+
+			//Caminar hacia abajo
+			if (t < 3.5f) {
+				cebraPos.x = -2.8f;
+				float totalDist = 3.25f;
+				cebraPos.z = -3.5f - (t * (totalDist / 3.5f));
+
+				// Ciclo de caminata
+				float paso = sin(t * 5.5f);
+				cebraPataDelDer = paso * 4.0f;
+				cebraPataTrasDer = paso * 4.0f;
+				cebraPataDelIzq = -paso * 4.0f;
+				cebraPataTrasIzq = -paso * 4.0f;
+
+				rotCebra = 180.0f;
+			}
+			// Girar hacia la izquierda 
+			else if (t < 4.5f)
+			{
+				float t2 = t - 3.5f;
+				cebraPos.x = -2.8f;
+				cebraPos.z = -6.75f;
+
+				// Rotación
+				rotCebra = 180.0f + (t2 * 90.0f);
+
+				// Detener patas
+				cebraPataDelDer = 0.0f;
+				cebraPataDelIzq = 0.0f;
+				cebraPataTrasDer = 0.0f;
+				cebraPataTrasIzq = 0.0f;
+			}
+			//Caminar hacia la izquierda
+			else if (t < 12.5f)
+			{
+				float t3 = t - 4.5f;
+				float totalDist = 7.7f;
+				cebraPos.x = -2.8f - (t3 * (totalDist / 8.0f));
+				cebraPos.z = -6.75f;
+
+				// Ciclo de caminata
+				float paso = sin(t3 * 5.5f);
+				cebraPataDelDer = paso * 4.0f;
+				cebraPataTrasDer = paso * 4.0f;
+				cebraPataDelIzq = -paso * 4.0f;
+				cebraPataTrasIzq = -paso * 4.0f;
+
+				rotCebra = 270.0f;
+			}
+			// Girar hacia arriba
+			else if (t < 13.5f)
+			{
+				float t4 = t - 12.5f;
+				cebraPos.x = -10.5f;
+				cebraPos.z = -6.75f;
+
+				// rotación
+				rotCebra = 270.0f + (t4 * 90.0f);
+
+				// Detener patas
+				cebraPataDelDer = 0.0f;
+				cebraPataDelIzq = 0.0f;
+				cebraPataTrasDer = 0.0f;
+				cebraPataTrasIzq = 0.0f;
+			}
+			// Caminar hacia arriba
+			else if (t < 17.0f)
+			{
+				float t5 = t - 13.5f;
+				cebraPos.x = -10.5f;
+				float totalDist = 3.25f;
+				cebraPos.z = -6.75f + (t5 * (totalDist / 3.5f));
+
+				// Ciclo de caminata
+				float paso = sin(t5 * 5.5f);
+				cebraPataDelDer = paso * 4.0f;
+				cebraPataTrasDer = paso * 4.0f;
+				cebraPataDelIzq = -paso * 4.0f;
+				cebraPataTrasIzq = -paso * 4.0f;
+				rotCebra = 0.0f;
+			}
+			// Giro final hacia la derecha
+			else if (t < 18.0f)
+			{
+				float t6 = t - 17.5f;
+				cebraPos.x = -10.5f;
+				cebraPos.z = -3.5f;
+
+				// rotación
+				rotCebra = t6 * 90.0f;
+
+				// Detener patas
+				cebraPataDelDer = 0.0f;
+				cebraPataDelIzq = 0.0f;
+				cebraPataTrasDer = 0.0f;
+				cebraPataTrasIzq = 0.0f;
+			}
+			//Caminar de regreso a la posición inicial
+			else if (t < 26.0f)
+			{
+				float t7 = t - 18.0f;
+				float totalDist = 7.7f;
+				cebraPos.x = -10.5f + (t7 * (totalDist / 8.0f));
+				cebraPos.z = -3.5f;
+
+				// Ciclo de caminata
+				float paso = sin(t7 * 5.5f);
+				cebraPataDelDer = paso * 4.0f;
+				cebraPataTrasDer = paso * 4.0f;
+				cebraPataDelIzq = -paso * 4.0f;
+				cebraPataTrasIzq = -paso * 4.0f;
+				rotCebra = 90.0f;
+			}
+			// Giro final
+			else if (t < 27.0f)
+			{
+				float t8 = t - 26.0f;
+				cebraPos.x = -2.8f;
+				cebraPos.z = -3.5f;
+
+				// rotación
+				rotCebra = 90.0f + (t8 * 90.0f);
+
+				// Detener patas
+				cebraPataDelDer = 0.0f;
+				cebraPataDelIzq = 0.0f;
+				cebraPataTrasDer = 0.0f;
+				cebraPataTrasIzq = 0.0f;
+			}
+			//Quieta en posición inicial
+			else
+			{
+				cebraPos.x = -2.8f;
+				cebraPos.z = -3.5f;
+				cebraPataDelDer = 0.0f;
+				cebraPataDelIzq = 0.0f;
+				cebraPataTrasDer = 0.0f;
+				cebraPataTrasIzq = 0.0f;
+				rotCebra = 180.0f;
+			}
+		}
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE MODELOS DESIERTO (-x,z)
@@ -2480,6 +2876,32 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	else
 	{
 		teclaO_presionada = false;
+	}
+
+	// ANIMALES SABANA
+
+	//ELEFANTE (Tecla V)
+	if (keys[GLFW_KEY_V]) {
+		if (!teclaV_presionada) {
+			animarElefante = !animarElefante;
+			startTimeElefante = glfwGetTime();
+			teclaV_presionada = true;
+		}
+	}
+	else {
+		teclaV_presionada = false;
+	}
+
+	// CEBRA (Tecla L)
+	if (keys[GLFW_KEY_L]) {
+		if (!teclaL_presionada) {
+			animarCebra = !animarCebra;
+			startTimeCebra = glfwGetTime();
+			teclaL_presionada = true;
+		}
+	}
+	else {
+		teclaL_presionada = false;
 	}
 
 	// Activa la animación del pinguino con la tecla 'C'
