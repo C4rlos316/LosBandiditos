@@ -30,6 +30,10 @@
 //Mixamo
 #include "modelAnim.h"
 
+//Audio
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
+
 // Funciones prototipo para callbacks
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
@@ -886,8 +890,19 @@ int main()
 	GLuint cubeMapTexture = TextureLoading::LoadCubemap(faces);
 
 
+	// Inicializar miniaudio para audio de fondo
+	ma_engine engine;
+	ma_result result = ma_engine_init(NULL, &engine);
+	if (result != MA_SUCCESS) {
+		std::cout << "Error al inicializar audio" << std::endl;
+	}
+	ma_sound sound;
+	ma_sound_init_from_file(&engine, "musica.mp3", 0, NULL, NULL, &sound);
+	ma_sound_set_looping(&sound, MA_TRUE);
+	ma_sound_start(&sound);
+
 	// =================================================================================
-	// 								CICLO DE RENDERIZADO (GAME LOOP)
+	// 								CICLO DE RENDERIZADO 
 	// =================================================================================
 
 	while (!glfwWindowShouldClose(window))
