@@ -57,6 +57,7 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Configuración de la cámara
 Camera  camera(glm::vec3(0.0f, 0.0f, 21.0f));
+bool teclaTAB_presionada = false; // Para cambiar de cámara
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 
@@ -569,7 +570,10 @@ int main()
 
 	std::cout << "Modelos cargados habitat pandas!" << std::endl;
 
-
+	// =================================================================================
+// 						CARGA DE MODELO - Personaje camara
+// =================================================================================
+	Model PersonajeAlex((char*)"Models/alex_leon/alex_leon.obj");
 	// =================================================================================
 	// 						CARGA DE MODELOS - Acuario (X,-Z)
 	// =================================================================================
@@ -1111,6 +1115,35 @@ int main()
 		// *** DIBUJO DEL PISO FONDO ***
 		DibujarPiso(pisoTextureID, glm::vec3(0.0f, -0.5f, -17.5f), glm::vec3(25.0f, 0.1f, 32.0f), VAO_Cubo, modelLoc);
 
+		//---------------------------------------------------------------------------------
+		// Dibujar personaje (Alex)
+		//---------------------------------------------------------------------------------
+		// Se dibuja si estamos en TERCERA PERSONA o en CÁMARA LIBRE (para ver dónde quedó)
+		if (camera.GetCameraType() == THIRD_PERSON || camera.GetCameraType() == FREE_CAMERA)
+		{
+			// Usamos targetPosition:
+			// - En 3ra persona: es la posición que estamos controlando.
+			// - En Libre: es la última posición donde dejamos al personaje.
+			glm::vec3 personPos = camera.targetPosition;
+
+			// --- Calcular rotación para que mire hacia donde apunta la cámara ---
+			// Usamos camera.front pero solo en X y Z para que no se incline hacia arriba/abajo
+			glm::vec3 cameraFront = camera.GetFront();
+			float yawAngle = glm::degrees(atan2(cameraFront.x, cameraFront.z));
+
+			glm::mat4 model = glm::mat4(1.0f);
+			// Ajusta el -1.4f según la altura de los pies de tu modelo Alex respecto al suelo
+			model = glm::translate(model, glm::vec3(personPos.x, personPos.y - 0.4f, personPos.z));
+
+			// Rotar modelo (el +180 depende de cómo fue exportado tu modelo obj, ajusta si mira al revés)
+			model = glm::rotate(model, glm::radians(yawAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+			// Ajusta la escala según tu modelo
+			model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+
+			glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			PersonajeAlex.Draw(lightingShader);
+		}
 
 		// =================================================================================
 		// 							DIBUJO DE PAREDES
@@ -2824,6 +2857,27 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		{
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
+	}
+
+	if (keys[GLFW_KEY_TAB])
+	{
+		if (!teclaTAB_presionada)
+		{
+			camera.ToggleCameraType();
+			teclaTAB_presionada = true;
+
+			// Feedback en consola para saber en qué modo estás
+			if (camera.GetCameraType() == FIRST_PERSON)
+				std::cout << "Camara: PRIMERA PERSONA" << std::endl;
+			else if (camera.GetCameraType() == THIRD_PERSON)
+				std::cout << "Camara: TERCERA PERSONA" << std::endl;
+			else
+				std::cout << "Camara: LIBRE (VUELO)" << std::endl;
+		}
+	}
+	else
+	{
+		teclaTAB_presionada = false;
 	}
 
 	//CONDOR(Tecla Z)
