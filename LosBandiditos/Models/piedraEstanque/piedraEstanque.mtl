@@ -1,0 +1,17 @@
+# Blender 4.5.2 LTS MTL File: 'piedra.blend'
+# www.blender.org
+
+newmtl tripo_mat_55c460d0-b7c3-433e-9c94-f1c664639ab9
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd pumicerock3dmodel_basecolor.JPEG
+map_Pm pumicerock3dmodel_metallic.JPEG
+map_Pr pumicerock3dmodel_roughness.JPEG
