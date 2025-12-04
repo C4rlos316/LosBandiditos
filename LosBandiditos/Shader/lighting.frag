@@ -59,6 +59,7 @@ uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
 uniform int transparency;
+uniform float alpha;
 
 
 // Function prototypes
@@ -84,10 +85,14 @@ void main( )
     // Spot light
     result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
  	
-    color = vec4( result,texture(material.diffuse, TexCoords).rgb );
-	  if(color.a < 0.1 && transparency==1)
+    // Obtener alpha de la textura o usar el uniform alpha
+    float textureAlpha = texture(material.diffuse, TexCoords).a;
+    float finalAlpha = textureAlpha * alpha;
+    
+    color = vec4(result, finalAlpha);
+    
+    if(transparency == 1 && finalAlpha < 0.1)
         discard;
-
 }
 
 // Calculates the color when using a directional light.
