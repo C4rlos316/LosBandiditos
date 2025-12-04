@@ -269,6 +269,15 @@ float rotOso = 270.0f;
 glm::vec3 osoPos = glm::vec3(4.0f, -0.4f, -23.0f);
 glm::vec3 osoPosActual = osoPos;
 
+// Venado ( X, -Z)
+float venadoScale = 0.012f; // Ajusta si queda muy grande o chico
+float rotVenado = 270.0f;     // Rotación inicial
+// Posición: OsoX (4.0) - 3.0 = 1.0. Misma altura (-0.5) y profundidad (-30.0)
+glm::vec3 venadoPosBase = glm::vec3(-4.2f, -0.5f, -23.0f);
+glm::vec3 venadoPosActual = venadoPosBase;// Constantes de animación FBX
+const float VENADO_FPS = 30.0f;
+const int VENADO_FRAME_WALK_END = 200;
+
 
 // -----------------------------------------
 //  TIBURÓN (ESTANQUE)
@@ -572,6 +581,9 @@ int main()
 
 	ModelAnim animacionOso((char*)"Models/Oso/oso.fbx");
 	animacionOso.initShaders(animShader.Program);
+
+	ModelAnim animacionVenado((char*)"Models/venado/venado.fbx");
+	animacionVenado.initShaders(animShader.Program);
 
 
 	std::cout << "Modelos cargados habitat pandas!" << std::endl;
@@ -1317,6 +1329,16 @@ int main()
 		Oso1 = glm::scale(Oso1, glm::vec3(osoScale));
 		animShader.setMat4("model", Oso1);
 		animacionOso.Draw(animShader);
+
+		// DIBUJO VENADO
+		glm::mat4 modelVenado = glm::mat4(1.0f);
+		modelVenado = glm::translate(modelVenado, venadoPosActual);
+		modelVenado = glm::rotate(modelVenado, glm::radians(rotVenado), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelVenado = glm::scale(modelVenado, glm::vec3(venadoScale));
+
+		animShader.setMat4("model", modelVenado);
+		animacionVenado.Draw(animShader);
+
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE CAMELLO
 		// ---------------------------------------------------------------------------------
@@ -1657,6 +1679,71 @@ int main()
 
 		// Movimiento de cabeza (m�s lento)
 		rotCabeza = sin(t_aves * 1.5f) * 5.0f; // Gira 15 grados a los lados
+
+		// =================================================================================
+// 							ANIMACIÓN VENADO (Patrulla Lineal Continua)
+// =================================================================================
+
+// Usamos el tiempo global para un bucle infinito automático
+		float t_venado = glfwGetTime();
+
+		// --- Configuración del recorrido ---
+		float dist = 5.0f;         // Distancia del recorrido
+		float timeWalk = 4.0f;     // Tiempo caminando
+		float timeTurn = 1.5f;     // Tiempo girando
+
+		// Ciclo total
+		float totalLoopTime = (timeWalk + timeTurn) * 2.0f;
+		float t_loop = fmod(t_venado, totalLoopTime);
+
+		// --- Calcular frame de animación FBX ---
+		float frameActualVenado = fmod(t_venado * VENADO_FPS, (float)VENADO_FRAME_WALK_END);
+
+		// --- MÁQUINA DE ESTADOS CORREGIDA ---
+		// Base de rotación: 270.0f (Mirando hacia +Z)
+
+		// 1. CAMINAR HACIA +Z (IDA)
+		if (t_loop < timeWalk)
+		{
+			float phase = t_loop / timeWalk;
+
+			// Avanza en Z
+			venadoPosActual.z = glm::mix(venadoPosBase.z, venadoPosBase.z + dist, phase);
+			venadoPosActual.x = venadoPosBase.x;
+
+			rotVenado = 270.0f; // Mantiene rotación inicial (mirando al frente)
+		}
+		// 2. MEDIA VUELTA (Girar 180 grados a la derecha)
+		else if (t_loop < timeWalk + timeTurn)
+		{
+			float phase = (t_loop - timeWalk) / timeTurn;
+
+			venadoPosActual.z = venadoPosBase.z + dist; // Quieto en el final
+
+			// Gira 
+			// Usamos interpolación lineal
+			rotVenado = glm::mix(270.0f, 90.0f, phase);
+		}
+		// 3. CAMINAR HACIA -Z (REGRESO)
+		else if (t_loop < (timeWalk * 2) + timeTurn)
+		{
+			float phase = (t_loop - (timeWalk + timeTurn)) / timeWalk;
+
+			// Regresa en Z
+			venadoPosActual.z = glm::mix(venadoPosBase.z + dist, venadoPosBase.z, phase);
+
+			rotVenado = 90.0f; // Mirando hacia atrás (opuesto a 270)
+		}
+		// 4. MEDIA VUELTA FINAL (Girar para reiniciar)
+		else
+		{
+			float phase = (t_loop - ((timeWalk * 2) + timeTurn)) / timeTurn;
+
+			venadoPosActual.z = venadoPosBase.z; // Quieto en el inicio
+
+			// Gira de 90 a -90  para cerrar el ciclo suavemente
+			rotVenado = glm::mix(90.0f, -90.0f, phase);
+		}
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIO ACUARIO
