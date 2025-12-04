@@ -35,7 +35,7 @@
 #include "miniaudio.h"
 
 // Funciones prototipo para callbacks
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
 
@@ -57,6 +57,7 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Configuración de la cámara
 Camera  camera(glm::vec3(0.0f, 0.0f, 21.0f));
+bool teclaTAB_presionada = false; // Para cambiar de cámara
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 
@@ -210,8 +211,8 @@ glm::vec3 camelloPos = glm::vec3(-4.0f, -0.5f, 10.0f);
 glm::vec3 camelloPosActual = camelloPos;
 bool animarCamelloFBX = true;
 float startTimeCamelloFBX = 0.0f;
-const float CAMELLO_FPS = 30.0f;  
-const int CAMELLO_FRAME_WALK_END = 200; 
+const float CAMELLO_FPS = 30.0f;
+const int CAMELLO_FRAME_WALK_END = 200;
 const int CAMELLO_FRAME_TOTAL = 306;
 const float CAMELLO_OFFSET_CACTUS = 1.2f;
 
@@ -310,9 +311,9 @@ float vertices[] = {
 float verticesPared[] = {
 	//  Cara Trasera (-Z)
 	-0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 0.0f,  
-	 0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 1.0f,  
-	 0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 1.0f,  
+	 0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   15.0f, 1.0f,
 	-0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
 	-0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
 
@@ -322,8 +323,8 @@ float verticesPared[] = {
 	//  Cara Frontal (+Z)
 	-0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
 	 0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f, 
-	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f, 
+	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f,
 	-0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 1.0f,
 	-0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
 
@@ -348,21 +349,21 @@ float verticesPared[] = {
 
 
 
-	 // Cara Inferior (-Y)
-	 -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
-	  0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 5.0f,
-	  0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 0.0f,
-	  0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 0.0f,
-	 -0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
-	 -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
+	// Cara Inferior (-Y)
+	-0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
+	 0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 5.0f,
+	 0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   5.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
 
-	 // Cara Superior (+Y)
-	 -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f,
-	  0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 5.0f,
-	  0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 0.0f,
-	  0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 0.0f,
-	 -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-	 -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f
+	// Cara Superior (+Y)
+	-0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f,
+	 0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 5.0f,
+	 0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   5.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f
 };
 
 //glm::vec3 lampColors[] = {
@@ -489,7 +490,7 @@ int main()
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 
-	
+
 	/*
 	================================================================================
 	CARGA DE SHADERS Y MODELOS 3D
@@ -596,7 +597,7 @@ int main()
 	// -----------------------------------------
 	//  CARGA DE MODELOS - TIBURÓN (ESTANQUE)
 	// -----------------------------------------
-	
+
 	Model Tiburon_Cuerpo((char*)"Models/tiburon/cuerpoTiburon.obj");
 	Model Tiburon_Cola((char*)"Models/tiburon/colaTiburon.obj");
 
@@ -607,6 +608,12 @@ int main()
 	// Agrega esto para verificar
 	std::cout << "Tiburon cuerpo cargado" << std::endl;
 	std::cout << "Tiburon cola cargado" << std::endl;
+
+	// =================================================================================
+	// 						CARGA DE MODELO - Personaje camara
+	// =================================================================================
+	Model PersonajeAlex((char*)"Models/alex_leon/alex_leon.obj");
+
 
 	// =================================================================================
 	// 						CARGA DE MODELOS - Acuario (X,-Z)
@@ -820,7 +827,7 @@ int main()
 	Model Cebra_PataTrasIzq((char*)"Models/cebra/cebra_pata_izq_atras.obj");
 
 	std::cout << "Modelos cargados sabana!" << std::endl;
-	
+
 	// =================================================================================
 	// 						Carga de Texturas para los pisos
 	// =================================================================================
@@ -1132,7 +1139,7 @@ int main()
 		//cargarTextura("images/madera.jpg", texMadera);
 		//cargarTextura("images/madera.jpg", texMetal);
 		//cargarTextura("images/madera.jpg", texPlastico);
-		
+
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIOS
@@ -1210,7 +1217,7 @@ int main()
 		modelAnim1 = glm::rotate(modelAnim1, glm::radians(rotPersonajeMixamo), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelAnim1 = glm::scale(modelAnim1, glm::vec3(personajeMixamoScale));
 		animShader.setMat4("model", modelAnim1);
-		animacionPersonaje.Draw(animShader); 
+		animacionPersonaje.Draw(animShader);
 
 
 		// ---------------------------------------------------------------------------------
@@ -1230,7 +1237,7 @@ int main()
 		// 							DIBUJO DE CAMELLO
 		// ---------------------------------------------------------------------------------
 		glm::mat4 camello1 = glm::mat4(1.0f);
-		camello1 = glm::translate(camello1, camelloPosActual); 
+		camello1 = glm::translate(camello1, camelloPosActual);
 		camello1 = glm::rotate(camello1, glm::radians(rotCamello), glm::vec3(0.0f, 1.0f, 0.0f));
 		camello1 = glm::scale(camello1, glm::vec3(camelloScale));
 		animShader.setMat4("model", camello1);
@@ -1250,9 +1257,9 @@ int main()
 		//// DIBUJO PISO HABITAT DE PANDAS ***
 		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -21.0f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
-	// ---------------------------------------------------------------------------------
-	// 							DIBUJO DE TIBURÓN (ESTANQUE)
-	// ---------------------------------------------------------------------------------
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE TIBURÓN (ESTANQUE)
+		// ---------------------------------------------------------------------------------
 
 		model = glm::mat4(1);
 		model = glm::translate(model, tiburonPos);
@@ -1274,7 +1281,7 @@ int main()
 		// ========================================
 		// DIBUJAR CUBO DE AGUA TRANSPARENTE
 		// ========================================
-		
+
 		// Agua opaca (otras áreas)
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1293,11 +1300,41 @@ int main()
 		glDisable(GL_BLEND);
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 
-	// ---------------------------------------------------------------------------------
-	// 							DIBUJO DE ESCENARIO ACUARIO
-	// ---------------------------------------------------------------------------------
+		//---------------------------------------------------------------------------------
+		// Dibujar personaje (Alex)
+		//---------------------------------------------------------------------------------
+		// Se dibuja si estamos en TERCERA PERSONA o en CÁMARA LIBRE (para ver dónde quedó)
+		if (camera.GetCameraType() == THIRD_PERSON || camera.GetCameraType() == FREE_CAMERA)
+		{
+			// Usamos targetPosition:
+			// - En 3ra persona: es la posición que estamos controlando.
+			// - En Libre: es la última posición donde dejamos al personaje.
+			glm::vec3 personPos = camera.targetPosition;
 
-		// **** DIBUJOS DEL PISO Y ACCESORIOS DE ACUARIO ****
+			// --- Calcular rotación para que mire hacia donde apunta la cámara ---
+			// Usamos camera.front pero solo en X y Z para que no se incline hacia arriba/abajo
+			glm::vec3 cameraFront = camera.GetFront();
+			float yawAngle = glm::degrees(atan2(cameraFront.x, cameraFront.z));
+
+			glm::mat4 model = glm::mat4(1.0f);
+			// Ajusta el -1.4f según la altura de los pies de tu modelo Alex respecto al suelo
+			model = glm::translate(model, glm::vec3(personPos.x, personPos.y - 0.4f, personPos.z));
+
+			// Rotar modelo (el +180 depende de cómo fue exportado tu modelo obj, ajusta si mira al revés)
+			model = glm::rotate(model, glm::radians(yawAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+			// Ajusta la escala según tu modelo
+			model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+
+			glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			PersonajeAlex.Draw(lightingShader);
+		}
+
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE ESCENARIO ACUARIO
+		// ---------------------------------------------------------------------------------
+
+			// **** DIBUJOS DEL PISO Y ACCESORIOS DE ACUARIO ****
 		DibujarPiso(pisoAcuarioTextureID, glm::vec3(7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
 
 		//modelo Agua
@@ -1630,7 +1667,7 @@ int main()
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE MODELOS SELVA (x,z)
 		// ---------------------------------------------------------------------------------
-		
+
 		// --- ENTRADA DEL ZOOLÓGICO ---
 		model = glm::mat4(1);
 		model = glm::translate(model, entradaPos);
@@ -2509,7 +2546,7 @@ int main()
 
 			// --- Calcular frame actual de la animación ---
 			float frameActual = t * CAMELLO_FPS;
-			if (frameActual >= CAMELLO_FRAME_TOTAL){
+			if (frameActual >= CAMELLO_FRAME_TOTAL) {
 				startTimeCamelloFBX = glfwGetTime();
 				t = 0.0f;
 				frameActual = 0.0f;
@@ -2540,10 +2577,10 @@ int main()
 				rotCamello = 180.0f;
 			}
 		}
-		else{
+		else {
 			camelloPosActual = camelloPos;
 		}
-		
+
 		//CONDOR
 		if (animarCondor) {
 			float t = glfwGetTime();
@@ -2674,63 +2711,7 @@ int main()
 
 
 		lightingShader.Use(); // shader de iluminación 
-		// -------------------------------------------------------------------------------- -
-	// 							DIBUJO DE MODELO JERÁRQUICO (BRAZO)
-	// ---------------------------------------------------------------------------------
-		//// Textura
-		//// (Asumimos que la textura difusa va en la unidad 0)
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, armTextureID);
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, armTextureID);
-
-		//glBindVertexArray(VAO_Cubo); // Usa el VAO del cubo
-
-		//// Habilitar los atributos (Ubicación 0 y 1 ya están habilitadas por defecto)
-		//glEnableVertexAttribArray(0); // Posición
-		//glEnableVertexAttribArray(1); // Normal
-		//glEnableVertexAttribArray(2); //Habilitar Coordenadas de Textura
-
-		//// Hombro
-		//glm::mat4 model_brazo = glm::mat4(1.0f);
-		//glm::mat4 modelTemp = glm::mat4(1.0f);
-		//// ... (Transformaciones hombro) ...
-		//model_brazo = glm::translate(model_brazo, glm::vec3(2.0f, 1.0f, 0.0f));
-		//model_brazo = glm::rotate(model_brazo, glm::radians(hombro_rot), glm::vec3(0.0f, 0.0f, 1.0f));
-		//modelTemp = model_brazo = glm::translate(model_brazo, glm::vec3(1.0f, 0.0f, 0.0f));
-		//model_brazo = glm::scale(model_brazo, glm::vec3(2.0f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model_brazo));
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		//// Antebrazo
-		//// ... (Transformaciones antebrazo) ...
-		//model_brazo = glm::translate(modelTemp, glm::vec3(1.0f, 0.0f, 0.0f));
-		//model_brazo = glm::rotate(model_brazo, glm::radians(codo_rot), glm::vec3(0.0f, 0.0f, 1.0f));
-		//model_brazo = glm::translate(model_brazo, glm::vec3(0.75f, 0.0f, 0.0f));
-		//model_brazo = glm::scale(model_brazo, glm::vec3(1.5f, 0.4f, 0.4f));
-		//glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model_brazo));
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		//glBindVertexArray(0); // Desvincular VAO_Cubo
-
-
-
-
-		//// Also draw the lamp object, again binding the appropriate shader
-		//lampShader.Use();
-		//// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
-		//modelLoc = glGetUniformLocation(lampShader.Program, "model");
-		//viewLoc = glGetUniformLocation(lampShader.Program, "view");
-		//projLoc = glGetUniformLocation(lampShader.Program, "projection");
-
-		//// Set matrices
-		//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		//glm::mat4 model = glm::mat4(1);
-		//model = glm::translate(model, lightPos);
-		//model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
+		
 
 		// ========================================================================
 		//								DIBUJAR SKYBOX
@@ -2914,6 +2895,27 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		}
 	}
 
+	if (keys[GLFW_KEY_TAB])
+	{
+		if (!teclaTAB_presionada)
+		{
+			camera.ToggleCameraType();
+			teclaTAB_presionada = true;
+
+			// Feedback en consola para saber en qué modo estás
+			if (camera.GetCameraType() == FIRST_PERSON)
+				std::cout << "Camara: PRIMERA PERSONA" << std::endl;
+			else if (camera.GetCameraType() == THIRD_PERSON)
+				std::cout << "Camara: TERCERA PERSONA" << std::endl;
+			else
+				std::cout << "Camara: LIBRE (VUELO)" << std::endl;
+		}
+	}
+	else
+	{
+		teclaTAB_presionada = false;
+	}
+
 	//CONDOR(Tecla Z)
 	if (keys[GLFW_KEY_Q]) {
 		if (!teclaQ_presionada) {
@@ -2950,7 +2952,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	{
 		teclaP_presionada = false;
 	}
-	 
+
 	//MONO (Tecla N)
 	if (keys[GLFW_KEY_N])
 	{
