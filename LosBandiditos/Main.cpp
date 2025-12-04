@@ -247,7 +247,17 @@ float panda1Scale = 0.005f;
 float rotPanda1 = 180.0f;
 glm::vec3 panda1Pos = glm::vec3(0.0f, -0.5f, 15.0f);
 
+// -----------------------------------------
+//  TIBURÓN (ESTANQUE)
+// -----------------------------------------
 
+float tiburonScale = 1.0f;
+float rotTiburon = 0.0f;
+float tiburonColaRot = 0.0f;
+glm::vec3 tiburonPos = glm::vec3(9.0f, 1.5f, -22.5f); // Ajusta la posición inicial según tu escena
+bool animarTiburon = false;
+float startTimeTiburon = 0.0f;
+bool teclaI_presionada = false;
 
 // Vértices para el piso
 float vertices[] = {
@@ -432,6 +442,7 @@ void cuboDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint unif
 
 int main()
 {
+
 	// =================================================================================
 	// INICIALIZACIÓN DE GLFW, GLEW Y VENTANA
 	// =================================================================================
@@ -569,6 +580,19 @@ int main()
 
 
 	std::cout << "Modelos cargados habitat pandas!" << std::endl;
+
+	// =================================================================================
+// 						CARGA DE MODELO - ENTRADA
+// =================================================================================
+
+	std::cout << "Cargando modelo de entrada..." << std::endl;
+
+	Model entradaZoologico((char*)"Models/entrada_separar/modelo_entrada.obj");
+	glm::vec3 entradaPos(0.0f, -0.5f, 0.0f);
+	glm::vec3 entradaScale(0.5f, 0.6f, 1.0f);
+	float entradaRot = 0.0f;
+
+	std::cout << "Modelo de entrada cargado!" << std::endl;
 
 	// =================================================================================
 // 						CARGA DE MODELO - Personaje camara
@@ -786,7 +810,7 @@ int main()
 	Model Cebra_PataTrasIzq((char*)"Models/cebra/cebra_pata_izq_atras.obj");
 
 	std::cout << "Modelos cargados sabana!" << std::endl;
-
+	
 	// =================================================================================
 	// 						Carga de Texturas para los pisos
 	// =================================================================================
@@ -1175,7 +1199,6 @@ int main()
 		// =================================================================================
 
 
-
 		// =================================================================================
 		// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
 		//				Aqui van todos los modelos fbx o dae con animaciones
@@ -1246,6 +1269,48 @@ int main()
 		//// DIBUJO PISO HABITAT DE PANDAS ***
 		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -21.0f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
+	// ---------------------------------------------------------------------------------
+	// 							DIBUJO DE TIBURÓN (ESTANQUE)
+	// ---------------------------------------------------------------------------------
+
+		model = glm::mat4(1);
+		model = glm::translate(model, tiburonPos);
+		model = glm::rotate(model, glm::radians(rotTiburon), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(tiburonScale));
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Tiburon_Cuerpo.Draw(lightingShader);
+
+		// Cola (pivot en la base de la cola donde se une al cuerpo)
+		glm::vec3 tiburonPivotCola(0.0f, 0.0f, -0.5f); // Ajusta según tu modelo
+		model = modelTemp;
+		model = glm::translate(model, tiburonPivotCola);
+		model = glm::rotate(model, glm::radians(tiburonColaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, -tiburonPivotCola);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Tiburon_Cola.Draw(lightingShader);
+
+		// ========================================
+		// DIBUJAR CUBO DE AGUA TRANSPARENTE
+		// ========================================
+		
+		// Agua opaca (otras áreas)
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+
+		model = glm::mat4(1);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texAgua);
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "alpha"), 0.4f); // Ajusta transparencia
+
+		AguaA.Draw(lightingShader);
+
+		glDisable(GL_BLEND);
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 
 	// ---------------------------------------------------------------------------------
 	// 							DIBUJO DE ESCENARIO ACUARIO
@@ -1585,8 +1650,17 @@ int main()
 		// 							DIBUJO DE MODELOS SELVA (x,z)
 		// ---------------------------------------------------------------------------------
 		
+		// --- ENTRADA DEL ZOOLÓGICO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, entradaPos);
+		model = glm::scale(model, entradaScale);
+		model = glm::rotate(model, glm::radians(entradaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		entradaZoologico.Draw(lightingShader);
+
 		// **** DIBUJO DEL PISO SELVA Y ACCESORIOS SELVA ****
 		DibujarPiso(pisoSelvaTextureID, glm::vec3(7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+
 		// --- ÁRBOL ---
 		model = glm::mat4(1);
 		model = glm::translate(model, arbolSelvaPos);
