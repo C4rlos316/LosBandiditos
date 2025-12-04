@@ -590,6 +590,7 @@ int main()
 
 	Model AguaA((char*)"ModelosAcuario/AguaA.obj");
 	GLuint texAgua = SOIL_load_OGL_texture("Texturas/Agua.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+
 	// Agrega esto para verificar
 	std::cout << "Tiburon cuerpo cargado" << std::endl;
 	std::cout << "Tiburon cola cargado" << std::endl;
