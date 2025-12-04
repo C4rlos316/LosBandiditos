@@ -599,6 +599,48 @@ int main()
 	glm::vec3 entradaScale(0.5f, 0.6f, 1.0f);
 	float entradaRot = 0.0f;
 
+	// HELLO KITTY
+	Model Kitty((char*)"Models/kitty/kitty.obj");
+	glm::vec3 kittyPos(-4.0f, 0.8f, 14.0f);
+	glm::vec3 kittyScale(2.5f, 2.5f, 2.5f);
+	float kittyRot = 270.0f;
+
+	// MONITO
+	Model Monito((char*)"Models/monitoEntrada/monito.obj");
+	glm::vec3 monitoPos(-7.0f, 0.6f, 14.0f);
+	glm::vec3 monitoScale(2.0f, 2.0f, 2.0f);
+	float monitoRot = 270.0f;
+
+	// CDMX
+	Model CDMX((char*)"Models/cdmx/cdmx.obj");
+	glm::vec3 cdmxPos(-9.5f, 0.4f, 20.0f);
+	glm::vec3 cdmxScale(5.0f, 5.0f, 4.0f);
+	float cdmxRot = -40.0f;
+
+	// CARRUSEL
+	Model Carrusel((char*)"Models/carruselNuevo/carruselNuevo.obj");
+	glm::vec3 carruselPos(10.0f, 1.0f, 20.0f);
+	glm::vec3 carruselScale(3.0f, 3.0f, 3.0f);
+	float carruselRot = 0.0f;
+
+	// ARBOL NAVIDAD
+	Model ArbolNavidad((char*)"Models/arbolNavidad/arbolNavidad.obj");
+	glm::vec3 arbolNavidadPos(10.0f, 1.0f, 15.0f);
+	glm::vec3 arbolNavidadScale(3.0f, 3.0f, 3.0f);
+	float arbolNavidadRot = 250.0f;
+
+	// TAQUILLA
+	Model Taquilla((char*)"Models/taquillaN/taquilla.obj");
+	glm::vec3 taquillaPos(6.0f, 0.4f, 14.7f);
+	glm::vec3 taquillaScale(4.5f, 4.5f, 4.5f);
+	float taquillaRot = 270.0f;
+
+	// NARUTO
+	Model Naruto((char*)"Models/naruto/naruto.obj");
+	glm::vec3 NarutoPos(4.7f, -0.5f, 15.2f);
+	glm::vec3 NarutoScale(0.010f, 0.010f, 0.010f);
+	float NarutoRot = 279.0f;
+
 	std::cout << "Modelo de entrada cargado!" << std::endl;
 
 	// -----------------------------------------
@@ -1279,6 +1321,66 @@ int main()
 		// 							DIBUJO DE MODELOS - ENTRADA
 		// =================================================================================
 
+		// --- HELLO KITTY ---
+		model = glm::mat4(1);
+		model = glm::translate(model, kittyPos);
+		model = glm::scale(model, kittyScale);
+		model = glm::rotate(model, glm::radians(kittyRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Kitty.Draw(lightingShader);
+
+		// --- MONITO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, monitoPos);
+		model = glm::scale(model, monitoScale);
+		model = glm::rotate(model, glm::radians(monitoRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Monito.Draw(lightingShader);
+
+		// --- CDMX ---
+		model = glm::mat4(1);
+		model = glm::translate(model, cdmxPos);
+		model = glm::scale(model, cdmxScale);
+		model = glm::rotate(model, glm::radians(cdmxRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		CDMX.Draw(lightingShader);
+
+		// --- CARRUSEL ---
+		carruselRot += 0.5f;
+		if (carruselRot >= 360.0f) {
+			carruselRot -= 360.0f;
+		}
+
+		model = glm::mat4(1);
+		model = glm::translate(model, carruselPos);
+		model = glm::scale(model, carruselScale);
+		model = glm::rotate(model, glm::radians(carruselRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Carrusel.Draw(lightingShader);
+
+		// --- ARBOL NAVIDAD ---
+		model = glm::mat4(1);
+		model = glm::translate(model, arbolNavidadPos);
+		model = glm::scale(model, arbolNavidadScale);
+		model = glm::rotate(model, glm::radians(arbolNavidadRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ArbolNavidad.Draw(lightingShader);
+
+		// --- TAQUILLA ---
+		model = glm::mat4(1);
+		model = glm::translate(model, taquillaPos);
+		model = glm::scale(model, taquillaScale);
+		model = glm::rotate(model, glm::radians(taquillaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Taquilla.Draw(lightingShader);
+
+		// --- NARUTO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, NarutoPos);
+		model = glm::scale(model, NarutoScale);
+		model = glm::rotate(model, glm::radians(NarutoRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Naruto.Draw(lightingShader);
 
 		// =================================================================================
 		// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
