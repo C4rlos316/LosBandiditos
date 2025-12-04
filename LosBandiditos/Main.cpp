@@ -257,7 +257,7 @@ glm::vec3 osoPosActual = osoPos;
 float tiburonScale = 1.0f;
 float rotTiburon = 0.0f;
 float tiburonColaRot = 0.0f;
-glm::vec3 tiburonPos = glm::vec3(9.0f, 1.5f, -22.5f); // Ajusta la posición inicial según tu escena
+glm::vec3 tiburonPos = glm::vec3(9.0f, 0.5f, -23); // Ajusta la posición inicial según tu escena
 bool animarTiburon = false;
 float startTimeTiburon = 0.0f;
 bool teclaI_presionada = false;
@@ -576,6 +576,46 @@ int main()
 
 	Model AguaA((char*)"ModelosAcuario/AguaA.obj");
 	GLuint texAgua = SOIL_load_OGL_texture("Texturas/Agua.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	
+	Model Estrella((char*)"Models/estrellaEstanque/estrellaEstanque.obj");
+	glm::vec3 estrellaPos(8.5f, -0.3f, -24.5);
+	glm::vec3 estrellaScale(1.0f, 1.0f, 1.0f);
+	float estrellaRot = 180.0f;
+
+	Model PiedraEstanque1((char*)"Models/piedraEstanque/piedraEstanque.obj");
+	glm::vec3 piedraEstanque1Pos(11.0f, -0.3f, -24.4f);
+	glm::vec3 piedraEstanque1Scale(3.0f, 2.5f, 3.0f);
+	float piedraEstanque1Rot = 180.0f;
+
+	Model PiedraEstanque2((char*)"Models/piedraEstanque/piedraEstanque.obj");
+	glm::vec3 piedraEstanque2Pos(11.0f, -0.3f, -22.0f);
+	glm::vec3 piedraEstanque2Scale(3.0f, 2.5f, 2.5f);
+	float piedraEstanque2Rot = 180.0f;
+
+	Model PiedraEstanque3((char*)"Models/piedraEst2/piedraEst2.obj");
+	glm::vec3 piedraEstanque3Pos(11.4f, -0.3f, -20.0f);
+	glm::vec3 piedraEstanque3Scale(2.5f, 2.5f, 3.5f);
+	float piedraEstanque3Rot = 180.0f;
+
+	Model PiedraEstanque4((char*)"Models/piedraEst2/piedraEst2.obj");
+	glm::vec3 piedraEstanque4Pos(11.4f, -0.3f, -17.5f);
+	glm::vec3 piedraEstanque4Scale(2.5f, 2.5f, 2.5f);
+	float piedraEstanque4Rot = 180.0f;
+
+	Model Coral1((char*)"Models/coral/coral.obj");
+	glm::vec3 coral1Pos(10.0f, -0.1f, -23.0f);
+	glm::vec3 coral1Scale(1.5f, 1.5f, 1.5f);
+	float coral1Rot = 180.0f;
+
+	Model Coral2((char*)"Models/coral/coral.obj");
+	glm::vec3 coral2Pos(10.5f, 0.2f, -18.0f);
+	glm::vec3 coral2Scale(1.5f, 1.5f, 1.5f);
+	float coral2Rot = 180.0f;
+
+	Model Medusa((char*)"Models/medusa/medusa.obj");
+	glm::vec3 medusaPos(8.0f, 0.5f, -17.0f);
+	glm::vec3 medusaScale(1.7f, 1.7f, 1.7f);
+	float medusaRot = 180.0f;
 
 	// Agrega esto para verificar
 	std::cout << "Tiburon cuerpo cargado" << std::endl;
@@ -841,6 +881,9 @@ int main()
 	GLuint pisoPandasTextureID = TextureFromFile("images/sand.jpg", ".");
 	ConfigurarTexturaRepetible(pisoPandasTextureID);
 
+	// *** TEXTURA PARA EL HÁBITAT DE PANDAS ***
+	GLuint pisoEstanqueTextureID = TextureFromFile("images/sand.jpg", ".");
+	ConfigurarTexturaRepetible(pisoEstanqueTextureID);
 
 	// =================================================================================
 	// 					CONFIGURACIÓN DE VÉRTICES PARA PRIMITIVAS
@@ -1238,6 +1281,9 @@ int main()
 		// 							DIBUJO DE TIBURÓN (ESTANQUE)
 		// ---------------------------------------------------------------------------------
 
+		//// DIBUJO PISO TIBURÓN (TIBURON) ***
+		DibujarPiso(pisoEstanqueTextureID, glm::vec3(10.0f, -0.49f, -21.0f), glm::vec3(5.1f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
+
 		model = glm::mat4(1);
 		model = glm::translate(model, tiburonPos);
 		model = glm::rotate(model, glm::radians(rotTiburon), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1255,6 +1301,135 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Tiburon_Cola.Draw(lightingShader);
 
+		// --- ESTRELLA ---
+		model = glm::mat4(1);
+		model = glm::translate(model, estrellaPos);
+		model = glm::scale(model, estrellaScale);
+		model = glm::rotate(model, glm::radians(estrellaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Estrella.Draw(lightingShader);
+
+		// --- PIEDRA 1 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, piedraEstanque1Pos);
+		model = glm::scale(model, piedraEstanque1Scale);
+		model = glm::rotate(model, glm::radians(piedraEstanque1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PiedraEstanque1.Draw(lightingShader);
+
+		// --- PIEDRA 2 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, piedraEstanque2Pos);
+		model = glm::scale(model, piedraEstanque2Scale);
+		model = glm::rotate(model, glm::radians(piedraEstanque2Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PiedraEstanque2.Draw(lightingShader);
+
+		// --- PIEDRA 3 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, piedraEstanque3Pos);
+		model = glm::scale(model, piedraEstanque3Scale);
+		model = glm::rotate(model, glm::radians(piedraEstanque3Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PiedraEstanque3.Draw(lightingShader);
+
+		// --- PIEDRA 4 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, piedraEstanque4Pos);
+		model = glm::scale(model, piedraEstanque4Scale);
+		model = glm::rotate(model, glm::radians(piedraEstanque4Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PiedraEstanque4.Draw(lightingShader);
+
+		// --- CORAL 1 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, coral1Pos);
+		model = glm::scale(model, coral1Scale);
+		model = glm::rotate(model, glm::radians(coral1Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Coral1.Draw(lightingShader);
+
+		// --- CORAL 2 ---
+		model = glm::mat4(1);
+		model = glm::translate(model, coral2Pos);
+		model = glm::scale(model, coral2Scale);
+		model = glm::rotate(model, glm::radians(coral2Rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Coral2.Draw(lightingShader);
+
+		// --- Medusa ---
+		model = glm::mat4(1);
+		model = glm::translate(model, medusaPos);
+		model = glm::scale(model, medusaScale);
+		model = glm::rotate(model, glm::radians(medusaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Medusa.Draw(lightingShader);
+
+		/// ========================================
+		// ANIMACIÓN DEL TIBURÓN (Primero nada, luego salta)
+		// ========================================
+		if (animarTiburon)
+		{
+			float t = glfwGetTime() - startTimeTiburon;
+
+			// ====================================
+			// PRIMERA ETAPA: SOLO NADA (0 a 2 s)
+			// ====================================
+			if (t < 2.0f)
+			{
+				float movX = sin(t * 1.2f) * 0.3f;
+				tiburonPos.x = 9.0f + movX;
+
+				tiburonColaRot = sin(t * 6.0f) * 20.0f;
+				tiburonPos.y = 0.5f;
+				rotTiburon = sin(t * 0.5f) * 3.0f;
+			}
+			else
+			{
+				// ====================================
+				// CICLO NORMAL: NADA + SALTA
+				// ====================================
+				float t2 = t - 2.0f;
+				float ciclo = fmod(t2, 5.0f); // <--- CICLO TOTAL MÁS LARGO (5s)
+
+				// Movimiento lateral
+				float movX = sin(t2 * 1.2f) * 0.3f;
+				tiburonPos.x = 9.0f + movX;
+
+				// Movimiento cola
+				tiburonColaRot = sin(t2 * 6.0f) * 20.0f;
+
+				// ----------- SALTO MÁS LARGO -----------
+				if (ciclo < 1.0f)
+				{
+					// SUBE más suavemente (1 segundo)
+					float j = ciclo / 1.0f;  // 0 → 1
+					tiburonPos.y = 0.5f + j * 2.5f; // sube más suave y alto
+				}
+				else if (ciclo < 1.6f)
+				{
+					// BAJA suave (0.6 segundos)
+					float j = (ciclo - 1.0f) / 0.6f; // 0 → 1
+					tiburonPos.y = (0.5f + 2.5f) - j * 2.5f;
+				}
+				else
+				{
+					// AGUA
+					tiburonPos.y = 0.5f;
+				}
+
+				// Rotación leve mientras nada
+				rotTiburon = sin(t2 * 0.5f) * 3.0f;
+			}
+		}
+		else
+		{
+			tiburonColaRot = 0;
+			rotTiburon = 0;
+			tiburonPos = glm::vec3(9.0f, 0.5f, -23);
+		}
+
+
 		// ========================================
 		// DIBUJAR CUBO DE AGUA TRANSPARENTE
 		// ========================================
@@ -1265,12 +1440,14 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
 
 		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(4.0f, -0.5f, -27.9f)); 
+		model = glm::scale(model, glm::vec3(0.87f, 0.8f, 1.209f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texAgua);
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "alpha"), 0.4f); // Ajusta transparencia
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "alpha"), 0.4f); 
 
 		AguaA.Draw(lightingShader);
 
@@ -1311,7 +1488,7 @@ int main()
 		// 							DIBUJO DE ESCENARIO ACUARIO
 		// ---------------------------------------------------------------------------------
 
-			// **** DIBUJOS DEL PISO Y ACCESORIOS DE ACUARIO ****
+		// **** DIBUJOS DEL PISO Y ACCESORIOS DE ACUARIO ****
 		DibujarPiso(pisoAcuarioTextureID, glm::vec3(7.25f, -0.49f, -7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
 
 		//modelo Agua
@@ -2940,6 +3117,21 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	else
 	{
 		teclaO_presionada = false;
+	}
+
+	//TIBURON
+	if (keys[GLFW_KEY_I])
+	{
+		if (!teclaI_presionada)
+		{
+			animarTiburon = !animarTiburon;
+			startTimeTiburon = glfwGetTime();
+			teclaI_presionada = true;
+		}
+	}
+	else
+	{
+		teclaI_presionada = false;
 	}
 
 	// ANIMALES SABANA

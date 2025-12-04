@@ -1,0 +1,13 @@
+# Blender 4.5.2 LTS MTL File: 'coral.blend'
+# www.blender.org
+
+newmtl tripo_mat_32becd41-34a0-453d-9076-f3caae2027d6
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd colorfulcoral3dmodel_basecolor.JPEG
+map_Ns colorfulcoral3dmodel_roughness.JPEG
+map_refl colorfulcoral3dmodel_metallic.JPEG
