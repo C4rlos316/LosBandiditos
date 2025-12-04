@@ -90,6 +90,10 @@ float personajeMixamoScale = 0.005f;
 float rotPersonajeMixamo = 180.0f;
 glm::vec3 personajeMixamoPos = glm::vec3(0.0f, -0.5f, 5.0f);
 
+glm::vec3 JakeMixamoPos = glm::vec3(-11.0f, -0.5f, -30.0f);
+float rotJakeMixamo = 90.0f;
+float jakeMixamoScale = 0.01f;
+
 //		Pinguino (Cuadrante X, -Z)
 float PinAlaIzq = 0.0f;
 float PinAlaDer = 0.0f;
@@ -558,6 +562,9 @@ int main()
 	ModelAnim animacionPersonaje((char*)"Models/Personaje1/Arm.dae");
 	animacionPersonaje.initShaders(animShader.Program);
 
+	ModelAnim animacionJake((char*)"Models/Talking/Talking.dae");
+	animacionJake.initShaders(animShader.Program);
+
 	// =================================================================================
 	// 						CARGA DE MODELO para Habitat de  PANDAS si es FBX 
 	// =================================================================================
@@ -683,6 +690,7 @@ int main()
 	// =================================================================================
 
 	Model BancaModel((char*)"Models/adornos/banca.obj");
+	Model PuestoModel((char*)"Models/puesto/puesto/puesto.obj");
 
 
 	Model Delfin((char*)"Models/delfin.obj");
@@ -1196,43 +1204,6 @@ int main()
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 modelTemp = glm::mat4(1.0f);
 
-		// ---------------------------------------------------------------------------------
-		// 							CARGA DE TEXTURAS
-		// ---------------------------------------------------------------------------------
-
-		//GLuint texMadera, texMetal, texPlastico;
-		//int textureWidth, textureHeight, nrChannels;
-		//unsigned char* image;
-
-		//// Función lambda para cargar texturas
-		//auto cargarTextura = [&](const char* path, GLuint& tex) {
-		//	glGenTextures(1, &tex);
-		//	glBindTexture(GL_TEXTURE_2D, tex);
-		//	stbi_set_flip_vertically_on_load(true);
-		//	image = stbi_load(path, &textureWidth, &textureHeight, &nrChannels, 0);
-		//	if (image)
-		//	{
-		//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		//		glGenerateMipmap(GL_TEXTURE_2D);
-		//	}
-		//	else
-		//	{
-		//		std::cout << "Failed to load texture: " << path << std::endl;
-		//	}
-		//	stbi_image_free(image);
-
-		//	// Parámetros de textura
-		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//	};
-
-		//// Cargar las tres texturas
-		//cargarTextura("images/madera.jpg", texMadera);
-		//cargarTextura("images/madera.jpg", texMetal);
-		//cargarTextura("images/madera.jpg", texPlastico);
-
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIOS
@@ -1312,6 +1283,13 @@ int main()
 		animShader.setMat4("model", modelAnim1);
 		animacionPersonaje.Draw(animShader);
 
+		// ========== PERSONAJE atendedor ==========
+		glm::mat4 modelJake = glm::mat4(1.0f);
+		modelJake = glm::translate(modelJake, JakeMixamoPos);
+		modelJake = glm::rotate(modelJake, glm::radians(rotJakeMixamo), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelJake = glm::scale(modelJake, glm::vec3(jakeMixamoScale));
+		animShader.setMat4("model", modelJake);
+		animacionJake.Draw(animShader);
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE PANDAS
@@ -1393,6 +1371,15 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		BancaModel.Draw(lightingShader);
 
+
+		// --- Puesto ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-10.0f, 0.7f, -30.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		PuestoModel.Draw(lightingShader);
+
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIO HABITAT PANDAS
 		// ---------------------------------------------------------------------------------
@@ -1400,10 +1387,10 @@ int main()
 		//// DIBUJO PISO HABITAT DE PANDAS ***
 		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -21.0f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
-		// ---------------------------------------------------------------------------------
-		// 							DIBUJO DE TIBURÓN (ESTANQUE)
-		// ---------------------------------------------------------------------------------
-
+//		// ---------------------------------------------------------------------------------
+//		// 							DIBUJO DE TIBURÓN (ESTANQUE)
+//		// ---------------------------------------------------------------------------------
+//
 		//// DIBUJO PISO TIBURÓN (TIBURON) ***
 		DibujarPiso(pisoEstanqueTextureID, glm::vec3(10.0f, -0.49f, -21.0f), glm::vec3(5.1f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
