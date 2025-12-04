@@ -139,16 +139,26 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="glad.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="meshAnim.h" />
+    <ClInclude Include="miniaudio.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="modelAnim.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\anim.fs" />
+    <None Include="Shader\anim.vs" />
     <None Include="Shader\lamp.frag" />
     <None Include="Shader\lamp.vs" />
     <None Include="Shader\lighting.frag" />
     <None Include="Shader\lighting.vs" />
     <None Include="Shader\modelLoading.frag" />
     <None Include="Shader\modelLoading.vs" />
+    <None Include="Shader\skybox.frag" />
+    <None Include="Shader\skybox.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
