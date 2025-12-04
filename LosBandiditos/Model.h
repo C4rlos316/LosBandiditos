@@ -207,30 +207,62 @@ private:
 	}
 };
 
-GLint TextureFromFile(const char *path, string directory)
+GLint TextureFromFile(const char* path, string directory)
 {
-	//Generate texture ID and load texture data
 	string filename = string(path);
 	filename = directory + '/' + filename;
+
 	GLuint textureID;
 	glGenTextures(1, &textureID);
 
-	int width, height;
+	// Verificar que OpenGL generó la textura correctamente
+	if (textureID == 0)
+	{
+		std::cout << "ERROR: No se pudo generar texture ID para " << filename << std::endl;
+		return 0;
+	}
 
-	unsigned char *image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+	int width, height, channels;
+	unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_RGB);
 
-	// Assign texture to ID
+	// VALIDACIÓN PRIMERO validar, DESPUÉS usar
+	if (image == nullptr || width == 0 || height == 0)
+	{
+		std::cout << "ERROR: " << filename << " - " << SOIL_last_result() << std::endl;
+
+		if (image != nullptr) SOIL_free_image_data(image);
+
+		// Textura blanca
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		unsigned char defaultTex[3] = { 255, 255, 255 };
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, defaultTex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		return textureID;
+	}
+
+	// CARGA EXITOSA
+	std::cout << "OK: " << filename << " (" << width << "x" << height << ")" << std::endl;
+
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	// Parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
 
+	// Verificar errores de OpenGL
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		std::cout << "ERROR OPENGL al cargar " << filename << ": " << error << std::endl;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	SOIL_free_image_data(image);
 	return textureID;
 }
