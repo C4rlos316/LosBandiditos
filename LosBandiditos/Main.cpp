@@ -242,10 +242,13 @@ bool teclaQ_presionada = false;
 //  Habitat Pandas
 // -----------------------------------------
 
-// PANDA 1 
-float panda1Scale = 0.005f;
-float rotPanda1 = 180.0f;
-glm::vec3 panda1Pos = glm::vec3(0.0f, -0.5f, 15.0f);
+// Oso ( X, -Z)
+
+float osoScale = 0.0035f;
+float rotOso = 270.0f;
+glm::vec3 osoPos = glm::vec3(4.0f, -0.4f, -23.0f);
+glm::vec3 osoPosActual = osoPos;
+
 
 // -----------------------------------------
 //  TIBURÓN (ESTANQUE)
@@ -380,40 +383,6 @@ glm::vec3 Light1 = glm::vec3(0);
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
-
-
-void pataDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID)
-{
-	// 1. Configurar la matriz del modelo para esta parte
-	modelo = glm::mat4(1);
-	modelo = glm::scale(modelo, escala); // tamaño
-	modelo = glm::translate(modelo, traslado);// posición
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelo));
-
-	// 2. Activar y enlazar la textura específica para esta parte
-	//    Asumimos que el shader ya tiene los uniforms de sampler (material.diffuse = 0, material.specular = 1)
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texturaID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texturaID); // Usamos la misma textura para difuso y especular
-
-	// 3. Enlazar el VAO del cubo
-	glBindVertexArray(VAO);
-
-	// 4. *** CRÍTICO *** Habilitar TODOS los atributos que usa lightingShader
-	// (El lampShader los deshabilita, así que hay que volver a habilitarlos)
-	glEnableVertexAttribArray(0); // Posición
-	glEnableVertexAttribArray(1); // Normal
-	glEnableVertexAttribArray(2); // TexCoords
-
-	// 5. Dibujar el cubo
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	// 6. Desvincular (buena práctica)
-	glBindVertexArray(0);
-
-
-}
 
 void cuboDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID, float rotacion)
 {
@@ -576,7 +545,10 @@ int main()
 	//// ====== PANDA2 ======
 	//ModelAnim animacionPanda2((char*)"Models/Personaje1/Arm.fbx");
 	//animacionPanda2.initShaders(animShader.Program);
+		// ====== Oso ======
 
+	ModelAnim animacionOso((char*)"Models/Oso/oso.fbx");
+	animacionOso.initShaders(animShader.Program);
 
 
 	std::cout << "Modelos cargados habitat pandas!" << std::endl;
@@ -1231,8 +1203,13 @@ int main()
 		//panda1 = glm::scale(panda1, glm::vec3(panda1Scale));
 		//animShader.setMat4("model", panda1);
 		//animacionPanda1.Draw(animShader); 
-
-
+		//Oso
+		glm::mat4 Oso1 = glm::mat4(1.0f);
+		Oso1 = glm::translate(Oso1, osoPosActual);
+		Oso1 = glm::rotate(Oso1, glm::radians(rotOso), glm::vec3(0.0f, 1.0f, 0.0f));
+		Oso1 = glm::scale(Oso1, glm::vec3(osoScale));
+		animShader.setMat4("model", Oso1);
+		animacionOso.Draw(animShader);
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE CAMELLO
 		// ---------------------------------------------------------------------------------
@@ -2690,24 +2667,6 @@ int main()
 		model = glm::translate(model, -tortugaPivotFR);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		TortugaLeg_FR1.Draw(lightingShader);
-
-
-		/*lightingShader.Use();
-		GLint objectColorLoc = glGetUniformLocation(lightingShader.Program, "objectColor");*/
-
-		/*glUniform3f(objectColorLoc, 0.0f, 1.0f, 0.0f);*/
-		/*pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(14.5f, -0.5f, 9.5f), modelLoc, VAO_Cubo, armTextureID);
-		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(-14.5f, -0.5f, 9.5f), modelLoc, VAO_Cubo, armTextureID);
-		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(-14.5f, -0.5f, -9.5f), modelLoc, VAO_Cubo, armTextureID);
-		pataDraw(model, glm::vec3(0.1f, 1.3f, 0.1f), glm::vec3(14.5f, -0.5f, -9.5f), modelLoc, VAO_Cubo, armTextureID);
-		pataDraw(model, glm::vec3(0.1f, 0.5f, 0.1f), glm::vec3(0.5f, 0.5f, -0.5f), modelLoc, VAO_Cubo, armTextureID);
-		pataDraw(model, glm::vec3(0.5f, 0.1f, 0.5f), glm::vec3(0.5f, 3.0f, -0.5f), modelLoc, VAO_Cubo, armTextureID);
-		pataDraw(model, glm::vec3(80.0f, 4.0f, 0.2f), glm::vec3(0.0f, 0.41f, -120.0f), modelLoc, VAO_Cubo, armTextureID);//pared uno
-		pataDraw(model, glm::vec3(0.2f, 4.0f, 48.0f), glm::vec3(200.0f, 0.41f, 0.0f), modelLoc, VAO_Cubo, armTextureID);//pared de enfrente
-		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(160.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de pinguino derecha
-		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(120.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de foca derecha
-		pataDraw(model, glm::vec3(0.2f, 4.0f, 10.0f), glm::vec3(77.0f, 0.41f, -1.9f), modelLoc, VAO_Cubo, armTextureID);//pared de delfín derecha*/
-
 
 
 		lightingShader.Use(); // shader de iluminación 
