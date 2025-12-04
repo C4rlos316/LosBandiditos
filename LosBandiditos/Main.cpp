@@ -580,6 +580,19 @@ int main()
 
 	std::cout << "Modelos cargados habitat pandas!" << std::endl;
 
+	// =================================================================================
+// 						CARGA DE MODELO - ENTRADA
+// =================================================================================
+
+	std::cout << "Cargando modelo de entrada..." << std::endl;
+
+	Model entradaZoologico((char*)"Models/entrada_separar/modelo_entrada.obj");
+	glm::vec3 entradaPos(0.0f, -0.5f, 0.0f);
+	glm::vec3 entradaScale(0.5f, 0.6f, 1.0f);
+	float entradaRot = 0.0f;
+
+	std::cout << "Modelo de entrada cargado!" << std::endl;
+
 	// -----------------------------------------
 	//  CARGA DE MODELOS - TIBURÓN (ESTANQUE)
 	// -----------------------------------------
@@ -1167,7 +1180,6 @@ int main()
 		// =================================================================================
 
 
-
 		// =================================================================================
 		// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
 		//				Aqui van todos los modelos fbx o dae con animaciones
@@ -1619,8 +1631,17 @@ int main()
 		// 							DIBUJO DE MODELOS SELVA (x,z)
 		// ---------------------------------------------------------------------------------
 		
+		// --- ENTRADA DEL ZOOLÓGICO ---
+		model = glm::mat4(1);
+		model = glm::translate(model, entradaPos);
+		model = glm::scale(model, entradaScale);
+		model = glm::rotate(model, glm::radians(entradaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		entradaZoologico.Draw(lightingShader);
+
 		// **** DIBUJO DEL PISO SELVA Y ACCESORIOS SELVA ****
 		DibujarPiso(pisoSelvaTextureID, glm::vec3(7.25f, -0.49f, 7.25f), glm::vec3(10.5f, 0.1f, 10.5f), VAO_Cubo, modelLoc);
+
 		// --- ÁRBOL ---
 		model = glm::mat4(1);
 		model = glm::translate(model, arbolSelvaPos);
