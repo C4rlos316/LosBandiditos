@@ -56,7 +56,7 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 
 // Configuración de la cámara
-Camera  camera(glm::vec3(0.0f, 0.0f, 21.0f));
+Camera  camera(glm::vec3(0.0f, 1.0f, 21.0f));
 bool teclaTAB_presionada = false; // Para cambiar de cámara
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
@@ -126,7 +126,13 @@ bool animarDelfin = false;
 float startTimeDelfin = 0.0f;
 bool teclaD_presionada = false; // Usaremos 'X' para activarlo
 
-
+// -----------------------------------------
+//  AVE (Cuadrante Central)
+// -----------------------------------------
+float rotAlaIzq = 0.0f;
+float rotAlaDer = 0.0f;
+float rotCabeza = 0.0f;
+glm::vec3 avePos = glm::vec3(0.0f, 1.0f, 0.0f); // Posición del ave en el centr
 // -----------------------------------------
 //  SELVA (X,Z)
 // -----------------------------------------
@@ -625,6 +631,22 @@ int main()
 	// 						CARGA DE MODELO - Personaje camara
 	// =================================================================================
 	Model PersonajeAlex((char*)"Models/alex_leon/alex_leon.obj");
+
+	// =================================================================================
+// 						CARGA DE MODELOS - AVIARIO (CENTRO)
+// =================================================================================
+
+	Model AviarioMadera((char*)"Models/Aviario/Aviariobase.obj");
+	Model AviarioVidrio((char*)"Models/Aviario/AviarioVidrio.obj");
+
+	// ---  Cargar aves ---
+	Model AveCuerpo((char*)"Models/Aviario/cuerpoave1.obj");
+	Model AveCabeza((char*)"Models/Aviario/cabezaave1.obj");
+	Model AveAlaIzq((char*)"Models/Aviario/alaizquierdaave1.obj");
+	Model AveAlaDer((char*)"Models/Aviario/aladerechaave1.obj");
+	Model AvePatas((char*)"Models/Aviario/patasave1.obj");
+	Model AveCola((char*)"Models/Aviario/colaave1.obj");
+
 
 
 	// =================================================================================
@@ -1472,7 +1494,7 @@ int main()
 
 			glm::mat4 model = glm::mat4(1.0f);
 			// Ajusta el -1.4f según la altura de los pies de tu modelo Alex respecto al suelo
-			model = glm::translate(model, glm::vec3(personPos.x, personPos.y - 0.4f, personPos.z));
+			model = glm::translate(model, glm::vec3(personPos.x, personPos.y - 1.4f, personPos.z));
 
 			// Rotar modelo (el +180 depende de cómo fue exportado tu modelo obj, ajusta si mira al revés)
 			model = glm::rotate(model, glm::radians(yawAngle), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1483,6 +1505,116 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			PersonajeAlex.Draw(lightingShader);
 		}
+
+		// =================================================================================
+	// 							DIBUJO DE MODELOS - AVIARIO (CENTRO)
+	// =================================================================================
+
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		AviarioMadera.Draw(lightingShader); // <-- Dibuja solo la madera
+
+
+		// --- 2. DIBUJAR LA PARTE TRANSPARENTE (Vidrio) ---
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// "Encendemos" el interruptor 'transparency' en el shader
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+
+		// Volvemos a aplicar la misma transformaci�n para el vidrio
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		AviarioVidrio.Draw(lightingShader); // <-- Dibuja solo el vidrio
+		glDisable(GL_BLEND);
+
+		// --- DIBUJAR EL AVE ---
+
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+
+		// Cuerpo: Esta es la matriz "padre"
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, avePos);
+		model = glm::scale(model, glm::vec3(0.5f));
+		modelTemp = model; // Guardamos la matriz del cuerpo
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		AveCuerpo.Draw(lightingShader);
+
+		// Cabez
+		glm::vec3 pivoteCabeza(0.0f, 0.5f, 0.1f); // (X,Y,Z) desde el centro del cuerpo (INVENTADO)
+		model = modelTemp;
+		model = glm::translate(model, pivoteCabeza);
+		model = glm::rotate(model, glm::radians(rotCabeza), glm::vec3(0.0f, 1.0f, 0.0f)); // Rota en Y
+		model = glm::translate(model, -pivoteCabeza);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		AveCabeza.Draw(lightingShader);
+
+		// Ala Izquierda
+
+		glm::vec3 pivoteAlaIzq(0.3f, 0.3f, 0.0f); // (X,Y,Z) desde el centro del cuerpo (INVENTADO)
+		model = modelTemp;
+		model = glm::translate(model, pivoteAlaIzq);
+		model = glm::rotate(model, glm::radians(rotAlaIzq), glm::vec3(0.0f, 0.0f, 1.0f)); // Rota en Z (aleteo)
+		model = glm::translate(model, -pivoteAlaIzq);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		AveAlaIzq.Draw(lightingShader);
+
+		// Ala Derecha
+
+		glm::vec3 pivoteAlaDer(-0.3f, 0.3f, 0.0f); // (X,Y,Z) desde el centro del cuerpo (INVENTADO)
+		model = modelTemp;
+		model = glm::translate(model, pivoteAlaDer);
+		model = glm::rotate(model, glm::radians(rotAlaDer), glm::vec3(0.0f, 0.0f, 1.0f)); // Rota en Z
+		model = glm::translate(model, -pivoteAlaDer);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		AveAlaDer.Draw(lightingShader);
+
+		// Cola
+
+		glm::vec3 pivoteCola(0.0f, 0.1f, -0.4f); // (INVENTADO)
+		model = modelTemp;
+		model = glm::translate(model, pivoteCola);
+		// (No hay rotaci�n para la cola en este ejemplo, pero aqu� ir�a)
+		model = glm::translate(model, -pivoteCola);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		AveCola.Draw(lightingShader);
+
+		// Patas
+
+		glm::vec3 pivotePatas(0.0f, -0.2f, 0.0f); // (INVENTADO)
+		model = modelTemp;
+		model = glm::translate(model, pivotePatas);
+		// (No hay rotaci�n para las patas)
+		model = glm::translate(model, -pivotePatas);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		AvePatas.Draw(lightingShader);
+
+
+		// Desactivamos todo para el resto de la escena
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+
+		// =================================================================================
+	// 							ANIMACI�N DE ANIMALES - AVIARIO (CENTRO)
+	// =================================================================================
+
+	// Hacemos que el ave aletee y mueva la cabeza
+		float t_aves = glfwGetTime();
+
+		// Aleteo (de -1 a 1 y de vuelta)
+		float aleteo = sin(t_aves * 6.0f); // 6.0 = aleteo r�pido
+		rotAlaIzq = aleteo * 20.0f; // Sube y baja 45 grados
+		rotAlaDer = -aleteo * 20.0f; // Sube y baja 45 grados (opuesto)
+
+		// Movimiento de cabeza (m�s lento)
+		rotCabeza = sin(t_aves * 1.5f) * 5.0f; // Gira 15 grados a los lados
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIO ACUARIO
