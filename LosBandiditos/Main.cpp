@@ -682,7 +682,9 @@ int main()
 	// 						CARGA DE MODELOS - Acuario (X,-Z)
 	// =================================================================================
 
-	Model Piso((char*)"Models/piso.obj");
+	Model BancaModel((char*)"Models/adornos/banca.obj");
+
+
 	Model Delfin((char*)"Models/delfin.obj");
 	Model cuerpoPin((char*)"Models/pinguino/cuerpo.obj");
 	Model arm1((char*)"Models/pinguino/arm1.obj");
@@ -1354,7 +1356,42 @@ int main()
 		// ========== VOLVER AL SHADER DE ILUMINACIÓN esto se deja hasta el final siempre ==========
 		lightingShader.Use();
 
+		// =================================================================================
+		// 							DIBUJO DE MODELOS - BANCAS
+		// =================================================================================
 
+
+		// --- Banca 2 (Camino Izquierdoo) ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-11.5f, -0.5f, 0.0f));
+		model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		BancaModel.Draw(lightingShader);
+
+		// --- Banca 3 (Camino Derechoo) ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(11.5f, -0.5f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		BancaModel.Draw(lightingShader);
+
+		// --- Banca 1 (Fondo izquierdo) ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-11.5f, -0.5f, -14.0f));
+		model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		BancaModel.Draw(lightingShader);
+
+		// --- Banca 4 (Fondo derecho) ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(11.5f, -0.5f, -14.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		BancaModel.Draw(lightingShader);
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIO HABITAT PANDAS
