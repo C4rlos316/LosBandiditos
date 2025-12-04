@@ -215,25 +215,26 @@ GLint TextureFromFile(const char* path, string directory)
 	GLuint textureID;
 	glGenTextures(1, &textureID);
 
-	// Verificar que OpenGL generó la textura correctamente
 	if (textureID == 0)
 	{
 		std::cout << "ERROR: No se pudo generar texture ID para " << filename << std::endl;
 		return 0;
 	}
 
-	int width, height, channels;
-	unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_RGB);
+	int width = 0, height = 0, channels = 0;
+	// CAMBIO IMPORTANTE: Usar SOIL_LOAD_AUTO en lugar de SOIL_LOAD_RGB
+	unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
 
-	// VALIDACIÓN PRIMERO validar, DESPUÉS usar
-	if (image == nullptr || width == 0 || height == 0)
+	if (image == nullptr || width <= 0 || height <= 0)
 	{
-		std::cout << "ERROR: " << filename << " - " << SOIL_last_result() << std::endl;
+		std::cout << "ERROR al cargar imagen: " << filename << std::endl;
+		std::cout << "SOIL Error: " << SOIL_last_result() << std::endl;
 
 		if (image != nullptr) SOIL_free_image_data(image);
 
-		// Textura blanca
+		// Crear textura blanca fallback (1x1)
 		glBindTexture(GL_TEXTURE_2D, textureID);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		unsigned char defaultTex[3] = { 255, 255, 255 };
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, defaultTex);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -242,24 +243,75 @@ GLint TextureFromFile(const char* path, string directory)
 		return textureID;
 	}
 
-	// CARGA EXITOSA
 	std::cout << "OK: " << filename << " (" << width << "x" << height << ")" << std::endl;
 
+	// Determinar formato según canales detectados
+	GLenum format = GL_RGB;
+	GLenum internalFormat = GL_RGB;
+	
+	switch (channels)
+	{
+	case 1:
+		format = GL_RED;
+		internalFormat = GL_RED;
+		break;
+	case 3:
+		format = GL_RGB;
+		internalFormat = GL_RGB;
+		break;
+	case 4:
+		format = GL_RGBA;
+		internalFormat = GL_RGBA;
+		break;
+	default:
+		std::cout << "WARN: Canales inesperados (" << channels << "), usando RGB" << std::endl;
+		format = GL_RGB;
+		internalFormat = GL_RGB;
+		break;
+	}
+
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	
+	// Establecer alineación ANTES de subir datos
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	// Limpiar errores previos
+	while (glGetError() != GL_NO_ERROR);
+
+	// Subir la textura con el formato correcto
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+
+	// Comprobar error INMEDIATAMENTE después de glTexImage2D
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		const char* errStr = "UNKNOWN";
+		switch (error)
+		{
+		case GL_INVALID_ENUM: errStr = "GL_INVALID_ENUM (formato o tipo inválido)"; break;
+		case GL_INVALID_VALUE: errStr = "GL_INVALID_VALUE (width/height inválido)"; break;
+		case GL_INVALID_OPERATION: errStr = "GL_INVALID_OPERATION (no hay contexto o TextureBinding inválido)"; break;
+		case GL_OUT_OF_MEMORY: errStr = "GL_OUT_OF_MEMORY (memoria insuficiente)"; break;
+		}
+		std::cout << "ERROR OpenGL en glTexImage2D para " << filename << ": " << errStr << std::endl;
+		
+		// Crear fallback blanco
+		unsigned char defaultTex[3] = { 255, 255, 255 };
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, defaultTex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		SOIL_free_image_data(image);
+		return textureID;
+	}
+
+	// Si llegamos aquí, glTexImage2D fue exitoso
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// Verificar errores de OpenGL
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		std::cout << "ERROR OPENGL al cargar " << filename << ": " << error << std::endl;
-	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
