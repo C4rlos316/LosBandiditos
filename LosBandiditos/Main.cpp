@@ -1,44 +1,89 @@
 ﻿/*
 ================================================================================
 	PROYECTO FINAL - COMPUTACIÓN GRÁFICA
-	Zoológico Virtual Interactivo en OpenGL
+	Zoológico  Interactivo en OpenGL
 ================================================================================
 
 DESCRIPCIÓN:
 	Simulación 3D de un zoológico virtual con múltiples hábitats (Acuario, Selva,
-	Sabana, Desierto, Aviario, Zona de Pandas). Incluye animaciones de animales, sistema de
-	iluminación dinámico, , skybox, audio, cámara intercambiable y renderizado con texturas.
+	Sabana, Desierto, Aviario, Pandas). Incluye animaciones de animales, sistema de
+	iluminación, cámara intercambiable y renderizado con texturas.
 
 CARACTERÍSTICAS PRINCIPALES:
 	- Renderizado 3D con OpenGL 3.3
-	- Sistema de cámara en primera, tercera persona y formato libre.
-	- Animaciones jerárquicas para 12 especies de animales
-	- Animación desde mixamo de dos modelos diferentes (.dae)
-	- Animación desde blender mediante esqueleto y keyframes de cuatro modelos diferentes (.fbx)
-	- Sistema de iluminación con luces puntuales, luz direccional y luz tipo spotlight
+	- Sistema de cámara en primera y tercera persona
+	- Animaciones jerárquicas para algunas especies de animales
+	- Animaciones  para otros animales formato FBX
+	- Animaciones activables por usuario
 	- Skybox para ambiente inmersivo
 	- Texturas repetibles para pisos diferenciados por hábitat
 	- Audio de fondo con miniaudio
-	- Modelos 3D cargados desde archivos .obj, .fbx y .dae
+	- Modelos 3D cargados desde archivos .obj
 
 CONTROLES:
-	- W/A/S/D o Flechas: Movimiento de cámara
-	- Mouse: Rotación de cámara
-	- TAB: Cambiar entre primera/tercera persona
-	- ESPACIO: Activar luz central animada
+┌─────────────────────────────────────────────────────────────────────┐
+│ CATEGORÍA: MOVIMIENTO DE CÁMARA                                     │
+├──────────┬──────────────────────────────────────────────────────────┤
+│ Tecla    │ Función                                                  │
+├──────────┼──────────────────────────────────────────────────────────┤
+│ W / ↑    │ Avanzar hacia adelante                                   │
+│ S / ↓    │ Retroceder                                               │
+│ A / ←    │ Moverse a la izquierda (strafe)                          │
+│ D / →    │ Moverse a la derecha (strafe)                            │
+│ Mouse    │ Rotar cámara (yaw/pitch)                                 │
+│ TAB      │ Cambiar modo de cámara (Libre/1ra/3ra persona)           │
+└──────────┴──────────────────────────────────────────────────────────┘
 
-	Animaciones de animales:
-	- V: Elefante (Sabana)
-	- J: Jirafa (Sabana)
-	- L: Cebra (Sabana)
-	- Z: Cóndor (Desierto)
-	- X: Tortuga (Desierto)
-	- P: Capibara (Selva)
-	- N: Mono (Selva)
-	- O: Guacamaya (Selva)
-	- C: Pinguino (Acuario)
-	- B: Foca (Acuario)
-	- X: Delfín (Acuario)
+┌─────────────────────────────────────────────────────────────────────┐
+│ CATEGORÍA: SISTEMA DE ILUMINACIÓN                                   │
+├──────────┬──────────────────────────────────────────────────────────┤
+│ SPACE    │ Toggle luz animada central (amarilla pulsante)           │
+│ H        │ Bajar altura de luz 0 (pointLightPositions[0].y)         │
+│ U        │ Alejar luz 0 en eje Z (hacia cámara)                     │
+│ J        │ Acercar luz 0 en eje Z (hacia escena)                    │
+└──────────┴──────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────── ┐
+│ CATEGORÍA: ANIMALES DEL ACUARIO					                   │
+├──────────┬──────────────────┬────────────────────────────────────────┤
+│ Tecla    │ Animal           │ Variable Activada                      │
+├──────────┼──────────────────┼────────────────────────────────────────┤
+│ C        │ Pingüino         │ animarPinguino, startTimePinguino      │
+│ B        │ Foca             │ animarFoca, startTimeFoca              │
+│ D        │ Delfín           │ animarDelfin, startTimeDelfin          │
+│ I        │ Tiburón          │ animarTiburon, startTimeTiburon        │
+└──────────┴──────────────────┴────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────── ┐
+│ CATEGORÍA: ANIMALES DE LA SELVA (Cuadrante +X, +Z)                   │
+├──────────┬──────────────────┬────────────────────────────────────────┤
+│ P        │ Capibara         │ animarCapibara, startTimeCapibara      │
+│ N        │ Mono             │ animarMono, startTimeMono              │
+│ O        │ Guacamaya        │ animarGuacamaya, startTimeGuacamaya    │
+└──────────┴──────────────────┴────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────── ┐
+│ CATEGORÍA: ANIMALES DE LA SABANA (Cuadrante -X, -Z)                  │
+├──────────┬──────────────────┬────────────────────────────────────────┤
+│ V        │ Elefante         │ animarElefante, startTimeElefante      │
+│ J        │ Jirafa           │ animarJirafa, startTimeJirafa          │
+│ L        │ Cebra            │ animarCebra, startTimeCebra            │
+└──────────┴──────────────────┴────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────── ┐
+│ CATEGORÍA: ANIMALES DEL DESIERTO (Cuadrante -X, +Z)                  │
+├──────────┬──────────────────┬────────────────────────────────────────┤
+│ Q        │ Cóndor           │ animarCondor, (sin startTime)          │
+│ X        │ Tortuga          │ animarTortuga, startTimeTortuga        │
+│          │ Camello          │ animarCamelloFBX (siempre activo)      │
+└──────────┴──────────────────┴────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ CATEGORÍA: OTROS CONTROLES                                          │
+├──────────┬──────────────────────────────────────────────────────────┤
+│ ESC      │ Cerrar aplicación                                        │
+└──────────┴──────────────────────────────────────────────────────────┘
+
 
 LIBRERÍAS UTILIZADAS:
 	- GLEW: Manejo de extensiones OpenGL
@@ -47,9 +92,6 @@ LIBRERÍAS UTILIZADAS:
 	- SOIL2: Carga de texturas
 	- STB_IMAGE: Procesamiento de imágenes
 	- miniaudio: Reproducción de audio
-	- Assimp: Carga de modelos 3D
-	- Mixamo: Animaciones de personajes
-	- Blender: Modelado y animación 3D
 
 ESTRUCTURA DEL CÓDIGO:
 	1. Declaración de funciones y variables globales
@@ -57,46 +99,39 @@ ESTRUCTURA DEL CÓDIGO:
 	3. Funciones auxiliares (ConfigurarVAO, ConfigurarTexturaRepetible, DibujarPiso)
 	4. Funciones de callbacks (DoMovement, KeyCallback, MouseCallback)
 
-AUTORES: -Uriel Benjamin De La Merced Soriano
+AUTORES:
 		 -Ana Isabel Diaz Bautista
+		 - Uriel Benjamin De La Merced Soriano
 		 -Carlos Mario Hernandez Gutierrez
 
-FECHA: 4 de Diciembre 2025
+FECHA: 04 Diciembre 2025
 ================================================================================
 */
 
+
+
 #include <iostream>
 #include <cmath>
-
 // GLEW
 #include <GL/glew.h>
-
 // GLFW
 #include <GLFW/glfw3.h>
-
 // Other Libs
 #include "stb_image.h"
-
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 //Load Models
 #include "SOIL2/SOIL2.h"
-
-
 // Other includes
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
-
 //Skybox
 #include "Texture.h"
-
 //Mixamo
 #include "modelAnim.h"
-
 //Audio
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
@@ -118,19 +153,21 @@ FUNCIONES AUXILIARES DE RENDERIZADO:
 */
 
 // Funciones prototipo para callbacks
-void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode);
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
 
+
+// =================================================================================
+// 	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
+// =================================================================================
 //Configurar funciones para repetir textura de piso
 void ConfigurarVAO(GLuint& VAO, GLuint& VBO, float* vertices, size_t size);
 void ConfigurarTexturaRepetible(GLuint textureID);
 void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc);
 
 /*
-================================================================================
-	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
-================================================================================
+
 
 PROPIEDADES DE VENTANA:
 	- WIDTH/HEIGHT: Dimensiones de la ventana (1280x720)
@@ -142,18 +179,21 @@ SISTEMA DE CÁMARA:
 	- lastX/lastY: Última posición del mouse para cálculo de delta
 	- keys[1024]: Array de estados de teclas
 	- firstMouse: Flag para inicialización de mouse
+	TIPOS DE CÁMARA (cambiar con TAB):
+	------------------------------------
+	- FREE_CAMERA:     Modo vuelo libre (default)
+	- FIRST_PERSON:    Vista desde ojos de Alex
+	- THIRD_PERSON:    Vista orbital alrededor de Alex
 
-SISTEMA DE ILUMINACIÓN:
-	- lightPos/lightPos2: Posiciones de luces auxiliares (legacy)
-	- pointLightPositions: Array de posiciones para luces puntuales
 
 CONTROL DE TIEMPO:
 	- deltaTime: Tiempo transcurrido entre frames (para movimiento suave)
 	- lastFrame: Timestamp del frame anterior
 */
 
+
 // Propiedades de la ventana
-const GLuint WIDTH = 1000, HEIGHT = 800;
+const GLuint WIDTH = 1280, HEIGHT = 720;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 
@@ -166,16 +206,14 @@ GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
 // Posiciones de las luces
-glm::vec3 lightPos(1.5f, 2.0f, -2.5f);
-glm::vec3 lightPos2(-1.5f, 2.0f, -2.5f);
 bool active;
 
 // Posiciones para luces puntuales 
 glm::vec3 pointLightPositions[] = {
-	glm::vec3(2.0f, 0.2f,  2.0f),  // Esquina 1 (Positivo X, Positivo Z)
-	glm::vec3(-2.0f, 0.2f,  2.0f),  // Esquina 2 (Negativo X, Positivo Z)
-	glm::vec3(2.0f, 0.2f, -2.0f),  // Esquina 3 (Positivo X, Negativo Z)
-	glm::vec3(-2.0f, 0.2f, -2.0f)   // Esquina 4 (Negativo X, Negativo Z)
+	glm::vec3(2.0f, 0.2f,  2.0f),
+	glm::vec3(-2.0f, 0.2f,  2.0f),
+	glm::vec3(2.0f, 0.2f, -2.0f),
+	glm::vec3(-2.0f, 0.2f, -2.0f)
 };
 
 /*
@@ -191,29 +229,32 @@ ESTRUCTURA DE DATOS POR ANIMAL:
 	- Flags de control de animación (animar*)
 	- Variables de timing (startTime*)
 	- Flags de control de teclas (tecla*_presionada)
+	- Tambien se tiene en cuenta los modelos que usan Huesos
 
 TÉCNICA DE ANIMACIÓN:
 	- Animación jerárquica: El cuerpo es el padre, las extremidades son hijos
 	- Interpolación temporal: Uso de glfwGetTime() para ciclos suaves
 	- Transformaciones por pivote: Traslación al pivote -> Rotación -> Vuelta
 	- Estados de animación: Cada animal tiene fases (caminar, girar, detenerse, etc.)
-	- Animación por keyframes: Modelos desde blender en .fbx
-	- Animación por esqueleto: Modelos desde mixamo en .dae
+	- Sistema de skeleton animation.
 
 CUADRANTES DEL ZOOLÓGICO:
-	- ACUARIO (X, -Z): Pingüino, Tortuga, Nutria
+	- ACUARIO (X, -Z): Pingüino, Foca, Delfín, Tiburón
 	- SELVA (X, Z): Capibara, Mono, Guacamaya
 	- SABANA (-X, -Z): Elefante, Jirafa, Cebra
 	- DESIERTO (-X, Z): Camello, Tortuga, Cóndor
 	- AVIARIO (Centro): Ave enjaulada
+	- HABITAT PANDAS : Oso, Venado, Panda
 */
+
 
 // =================================================================================
 // 						ANIMACIÓN Y POSICIONES BASE DE ANIMALES
 // =================================================================================
 
+
 // -----------------------------------------
-//  PERSONAJE MIXAMO (CENTRO)
+//  PERSONAJE  (CENTRO)
 // -----------------------------------------
 
 float personajeMixamoScale = 0.005f;
@@ -224,7 +265,7 @@ glm::vec3 JakeMixamoPos = glm::vec3(-11.0f, -0.5f, -30.0f);
 float rotJakeMixamo = 90.0f;
 float jakeMixamoScale = 0.01f;
 
-//		Pinguino (Cuadrante X, -Z)
+//	Pinguino (Cuadrante X, -Z)
 float PinAlaIzq = 0.0f;
 float PinAlaDer = 0.0f;
 float PinScale = 0.70f;
@@ -437,27 +478,30 @@ glm::vec3 tiburonPos = glm::vec3(9.0f, 0.5f, -23); // Ajusta la posición inicia
 bool animarTiburon = false;
 float startTimeTiburon = 0.0f;
 bool teclaI_presionada = false;
+
+
 /*
-	================================================================================
-		DATOS DE GEOMETRÍA - VÉRTICES DE PRIMITIVAS
-	================================================================================
+================================================================================
+	DATOS DE GEOMETRÍA - VÉRTICES DE PRIMITIVAS
+================================================================================
 
-	FORMATO DE VÉRTICES:
-		Cada vértice contiene 8 floats:
-		- Posiciones (x, y, z): Coordenadas en espacio objeto
-		- Normales (nx, ny, nz): Vector perpendicular para iluminación
-		- Coordenadas UV (u, v): Mapeo de texturas
+FORMATO DE VÉRTICES:
+	Cada vértice contiene 8 floats:
+	- Posiciones (x, y, z): Coordenadas en espacio objeto
+	- Normales (nx, ny, nz): Vector perpendicular para iluminación
+	- Coordenadas UV (u, v): Mapeo de texturas
 
-	ARRAY vertices[]:
-		Define un cubo unitario centrado en origen
-		Usado para: Pisos, paredes base y geometría simple
-		Coordenadas UV ajustadas para repetición (0-10 en cara inferior/superior)
+ARRAY vertices[]:
+	Define un cubo unitario centrado en origen
+	Usado para: Pisos, paredes base y geometría simple
+	Coordenadas UV ajustadas para repetición (0-10 en cara inferior/superior)
 
-	ARRAY verticesPared[]:
-		Cubo con coordenadas UV optimizadas para texturas de muro
-		Mayor repetición horizontal (0-15) que vertical (0-5)
-		Mantiene proporción realista de ladrillos/bloques
-	*/
+ARRAY verticesPared[]:
+	Cubo con coordenadas UV optimizadas para texturas de muro
+	Mayor repetición horizontal (0-15) que vertical (0-5)
+	Mantiene proporción realista de ladrillos/bloques
+*/
+
 // Vértices para el piso
 float vertices[] = {
 	// Posiciones           // Normales           // Coordenadas de Textura (U, V)
@@ -489,14 +533,14 @@ float vertices[] = {
 	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
 	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
 	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	 // Cara Inferior (-Y) *** MODIFICADA PARA REPETIR TEXTURA ***
+	 // Cara Inferior (-Y) 
 	 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 10.0f,
 	  0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  10.0f, 10.0f,
 	  0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  10.0f, 0.0f,
 	  0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  10.0f, 0.0f,
 	 -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
 	 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 10.0f,
-	 // Cara Superior (+Y) *** MODIFICADA PARA REPETIR TEXTURA ***
+	 // Cara Superior (+Y)
 	 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 10.0f,
 	  0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  10.0f, 10.0f,
 	  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  10.0f, 0.0f,
@@ -516,9 +560,6 @@ float verticesPared[] = {
 	-0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
 	-0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
 
-
-
-
 	//  Cara Frontal (+Z)
 	-0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
 	 0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 0.0f,
@@ -526,7 +567,6 @@ float verticesPared[] = {
 	 0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   11.0f, 1.0f,
 	-0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 1.0f,
 	-0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
-
 
 	// Cara Izquierda (-X) 
 	-0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
@@ -536,8 +576,6 @@ float verticesPared[] = {
 	-0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
 	-0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
 
-
-
 	// Cara Derecha (+X)
 	0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
 	0.5f,  0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   20.0f, 1.0f,
@@ -545,8 +583,6 @@ float verticesPared[] = {
 	0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   20.0f, 0.0f,
 	0.5f, -0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
 	0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-
-
 
 	// Cara Inferior (-Y)
 	-0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 5.0f,
@@ -565,12 +601,6 @@ float verticesPared[] = {
 	-0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 5.0f
 };
 
-//glm::vec3 lampColors[] = {
-//	glm::vec3(1.0f, 0.0f, 0.0f), // Rojo
-//	glm::vec3(0.0f, 1.0f, 0.0f), // Verde
-//	glm::vec3(0.0f, 0.0f, 1.0f), // Azul
-//	glm::vec3(1.0f, 1.0f, 1.0f)  // Blanco
-//};
 
 glm::vec3 Light1 = glm::vec3(0);
 
@@ -578,13 +608,7 @@ glm::vec3 Light1 = glm::vec3(0);
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
-/*
-	================================================================================
-		FUNCIÓN CUBO DRAW 
-	================================================================================
 
-	Función para dibujar un cubo con transformaciones locales y de padre.
-	*/
 
 void cuboDraw(glm::mat4 parentModel, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID, float rotacion)
 {
@@ -621,13 +645,6 @@ void cuboDraw(glm::mat4 parentModel, glm::vec3 escala, glm::vec3 traslado, GLint
  * Consta de una barra central (mesa) y dos barras laterales (asientos).
  * Centrado en (0,0,0).
 */
-/*
-	================================================================================
-		FUNCIÓN DIBUJAR BANCA CENTRO COMERCIAL
-	================================================================================
-
-	función para dibujar un conjunto de mesa y bancas estilo centro comercial.
-	*/
 void dibujarBancaCentroComercial(glm::mat4 parentModel, GLint modelLoc, GLuint VAO_Cubo, GLuint texturaID)
 {
 	// --- Dimensiones Generales ---
@@ -695,6 +712,9 @@ void dibujarBancaCentroComercial(glm::mat4 parentModel, GLint modelLoc, GLuint V
 		glm::vec3(0.0f, altoSoporteBanca / 2.0f, separacion),
 		modelLoc, VAO_Cubo, texturaID, 0.0f);
 }
+
+
+
 /*
 ================================================================================
 	FUNCIÓN MAIN - PUNTO DE ENTRADA DEL PROGRAMA
@@ -713,7 +733,6 @@ FASE 2: INICIALIZACIÓN DE GLEW
 FASE 3: CONFIGURACIÓN DE VIEWPORT
 	- Definición del área de renderizado
 */
-
 
 int main()
 {
@@ -775,15 +794,14 @@ int main()
 	- lightingShader: Shader principal con modelo de iluminación Phong
 	- lampShader: Shader simplificado para objetos emisores de luz
 	- skyboxShader: Shader especializado para cubemap ambiental
+	- animShader: Shader para modelos con animaciones FBX (Mixamo)
 	*/
 
 	// Cargar shaders
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
-
 	Shader skyboxShader("Shader/skybox.vs", "Shader/skybox.frag");
-
-	// Animaciones Mixamo
+	// Animaciones CON HUESOS
 	Shader animShader("Shader/anim.vs", "Shader/anim.fs");
 
 
@@ -827,20 +845,43 @@ int main()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	// =================================================================================
-	// 						CARGA DE MODELO que sean de FBX hay que usar estas funciones
-	//								sino no funcionan las animaciones
-	//								ModelAnim y .initShaders(animShader.Program);
-	// =================================================================================
+
+	/* MODELOS 3D:
+	Los modelos se cargan desde archivos .obj usando la clase Model
+	Organizados por secciones:
+
+	PERSONAJE: Alex (león) - Modelo visible en tercera persona
+
+	ENTRADA: Letrero, Taquilla, Adornos (Naruto, Hello Kitty, CDMX, Carrusel)
+
+
+	ACUARIO: Escenario, Iglú, Pingüino, Foca , Delfin.
+
+	SELVA: Árbol, Decoración (sandía, troncos, pelota, plátanos, gato, rama),
+		   Plantas, Lotos, Capibara, Mono , Guacamaya
+
+	DESIERTO: Oasis, Huesos, Tronco, Cactus, Camello, Tortuga , Cóndor
+
+	SABANA: Árboles, Rocas, Plantas, Elefante, Jirafa , Cebra
+
+	AVIARIO: Estructura, Ave central (6 partes)
+
+	ESTANQUE: Agua, Rocas, Plantas, Tiburón Medusa
+	PANDAS Habitat: (árboles + plantas), Panda, Oso , Venado
+
+	- Bancas de centro comercial y puesto de comida rápida
+
+*/
+
+// =================================================================================
+// 						CARGA DE MODELO que sean de FBX
+// =================================================================================
 	ModelAnim animacionPersonaje((char*)"Models/Personaje1/Arm.dae");
 	animacionPersonaje.initShaders(animShader.Program);
 
 	ModelAnim animacionJake((char*)"Models/Talking/Talking.dae");
 	animacionJake.initShaders(animShader.Program);
 
-	// =================================================================================
-	// 						CARGA DE MODELO para Habitat de  PANDAS si es FBX 
-	// =================================================================================
 
 	std::cout << "Cargando modelos habitat pandas..." << std::endl;
 
@@ -854,10 +895,7 @@ int main()
 	ModelAnim animacionPanda1((char*)"Models/Personaje1/Arm.dae");
 	animacionPanda1.initShaders(animShader.Program);
 
-	//// ====== PANDA2 ======
-	//ModelAnim animacionPanda2((char*)"Models/Personaje1/Arm.fbx");
-	//animacionPanda2.initShaders(animShader.Program);
-		// ====== Oso ======
+	// ====== Oso ======
 
 	ModelAnim animacionOso((char*)"Models/Oso/oso.fbx");
 	animacionOso.initShaders(animShader.Program);
@@ -936,7 +974,7 @@ int main()
 
 	Model AguaA((char*)"ModelosAcuario/AguaA.obj");
 	GLuint texAgua = SOIL_load_OGL_texture("Texturas/Agua.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
-	
+
 	Model Estrella((char*)"Models/estrellaEstanque/estrellaEstanque.obj");
 	glm::vec3 estrellaPos(8.5f, -0.3f, -24.5);
 	glm::vec3 estrellaScale(1.0f, 1.0f, 1.0f);
@@ -977,7 +1015,6 @@ int main()
 	glm::vec3 medusaScale(1.7f, 1.7f, 1.7f);
 	float medusaRot = 180.0f;
 
-	// Agrega esto para verificar
 	std::cout << "Tiburon cuerpo cargado" << std::endl;
 	std::cout << "Tiburon cola cargado" << std::endl;
 
@@ -1027,10 +1064,6 @@ int main()
 	Model pino((char*)"Models/pino/nievepino.obj");
 
 	// Carga textura
-	GLuint armTextureID = TextureFromFile("images/madera.jpg", ".");
-	GLuint greenTextureID = TextureFromFile("images/textverde.jpg", ".");
-	GLuint amarilloTextureID = TextureFromFile("images/textamarillo.jpg", ".");
-	GLuint cafeTextureID = TextureFromFile("images/cafe.jpg", ".");
 	GLuint grisTextureID = TextureFromFile("images/gris.jpg", ".");
 
 
@@ -1246,6 +1279,34 @@ int main()
 
 	std::cout << "Modelos cargados sabana!" << std::endl;
 
+
+	/*
+	================================================================================
+		SISTEMA DE TEXTURAS
+	================================================================================
+
+	CARGA Y CONFIGURACIÓN:
+	- TextureFromFile(): Carga imágenes desde disco
+	- ConfigurarTexturaRepetible(): Establece parámetros de wrapping/filtering
+
+	TEXTURAS CARGADAS:
+	- pisoTextureID: Ladrillo (piso general)
+	- pisoEntradaID: Pasto (zona de acceso)
+	- paredTextureID: Muro (cercado)
+	- pisoAcuarioTextureID: Textura acuática general
+	- pisoSelvaTextureID: Vegetación
+	- pisoSabanaTextureID: Tierra seca con pasto
+	- pisoArenaTextureID: Arena desértica
+	- pisoPandasTextureID: Bosque de bambú
+	- pisoEstanqueTextureID: Zona alrededor del estanque
+	-
+
+	PARÁMETROS DE REPETICIÓN:
+	- GL_REPEAT: Permite tiling para áreas grandes
+	- GL_LINEAR_MIPMAP_LINEAR: Filtrado trilineal para calidad
+	- Coordenadas UV escaladas (0-10) para múltiples repeticiones
+	*/
+
 	// =================================================================================
 	// 						Carga de Texturas para los pisos
 	// =================================================================================
@@ -1291,9 +1352,33 @@ int main()
 	GLuint pisoEstanqueTextureID = TextureFromFile("images/sand.jpg", ".");
 	ConfigurarTexturaRepetible(pisoEstanqueTextureID);
 
-	// =================================================================================
-	// 					CONFIGURACIÓN DE VÉRTICES PARA PRIMITIVAS
-	// =================================================================================
+
+
+	/*
+	================================================================================
+		CONFIGURACIÓN DE VERTEX ARRAY OBJECTS (VAOs)
+	================================================================================
+
+	VAO_Cubo: Usado para pisos y geometría básica
+	VAO_Pared: Optimizado para paredes con UV ajustadas
+	VAO_Entrada: Duplicado de cubo para zona de entrada
+	skyboxVAO: Cubo invertido para renderizado de skybox
+
+	PROCESO:
+		1. Generación de VAO y VBO
+		2. Carga de datos de vértices en GPU
+		3. Configuración de atributos:
+		   - Location 0: Posición (vec3)
+		   - Location 1: Normal (vec3)
+		   - Location 2: UV (vec2)
+		4. Desvinculación para evitar modificaciones accidentales
+
+	SKYBOX:
+		- Vertices simplificados (solo posiciones)
+		- Renderizado con depth testing especial (GL_LEQUAL)
+		- Mapeo a cubemap texture para ambiente 360°
+	*/
+
 
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -1355,8 +1440,24 @@ int main()
 	faces.push_back("images/skybox/front.jpg");
 	GLuint cubeMapTexture = TextureLoading::LoadCubemap(faces);
 
+	/*
+================================================================================
+	SISTEMA DE AUDIO - miniaudio
+================================================================================
 
-	// Inicializar miniaudio para audio de fondo
+CONFIGURACIÓN:
+	- ma_engine: Motor de audio de alto nivel
+	- ma_engine_init(): Inicializa con configuración por defecto
+	- ma_engine_play_sound(): Reproduce archivo mp3 en loop
+
+FLUJO:
+	1. Creación del engine
+	2. Validación de inicialización exitosa
+	3. Reproducción de "musica.mp3" de fondo
+	4. El engine maneja automáticamente el streaming y mixing
+*/
+
+// Inicializar miniaudio para audio de fondo
 	ma_engine engine;
 	ma_result result = ma_engine_init(NULL, &engine);
 	if (result != MA_SUCCESS) {
@@ -1371,6 +1472,24 @@ int main()
 	// 								CICLO DE RENDERIZADO 
 	// =================================================================================
 
+		/*
+	ESTRUCTURA DEL FRAME:
+		1. Cálculo de deltaTime (para movimiento independiente del framerate)
+		2. Procesamiento de eventos (glfwPollEvents)
+		3. Actualización de estado (DoMovement)
+		4. Limpieza de buffers (color + profundidad)
+		5. Activación de depth testing
+		6. Configuración de shader y uniforms
+		7. Renderizado de geometría
+		8. Renderizado de skybox
+		9. Swap de buffers (presentación)
+
+	GESTIÓN DE TIEMPO:
+		- deltaTime = currentFrame - lastFrame
+		- Permite velocidad constante independiente de FPS
+		- Usado en movimiento de cámara y animaciones
+	*/
+
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -1378,22 +1497,14 @@ int main()
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
-		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
-
 		// Clear the colorbuffer
 		glClearColor(0.6f, 0.7f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// OpenGL options
 		glEnable(GL_DEPTH_TEST);
-
-
-
-		//Load Model
-
 
 		// Use cooresponding shader when setting uniforms/drawing objects
 		lightingShader.Use();
@@ -1407,53 +1518,15 @@ int main()
 
 		// Luz Direccional (dirLight)
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.3f, -0.7f, -0.4f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.4f, 0.4f, 0.45f);  //  MÁS BRILLANTE (era 0.05)
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.9f, 0.85f, 0.75f); //  Tono cálido (era 0.6)
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.8f, 0.8f, 0.7f);  //  Más brillo
-		// Luces Puntuales (pointLights) - Usando los colores de las lámparas
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.4f, 0.4f, 0.45f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.9f, 0.85f, 0.75f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.8f, 0.8f, 0.7f);
+
 		// Point light 1
 		glm::vec3 lightColor;
 		lightColor.x = abs(sin(glfwGetTime() * Light1.x));
 		lightColor.y = abs(sin(glfwGetTime() * Light1.y));
 		lightColor.z = sin(glfwGetTime() * Light1.z);
-
-		//
-		//// Point light 0 (Rojo)
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient")/*, lampColors[0].r * 0.1f, lampColors[0].g * 0.1f, lampColors[0].b * 0.1f*/); // Ambiente Rojo tenue
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse")/*, lampColors[0].r, lampColors[0].g, lampColors[0].b*/);       // Difuso Rojo
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular")/*, lampColors[0].r, lampColors[0].g, lampColors[0].b*/);      // Especular Rojo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f); // Atenuación específica
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f); // Atenuación específica
-
-		//// Point light 1 (Verde)
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), lampColors[1].r * 0.1f, lampColors[1].g * 0.1f, lampColors[1].b * 0.1f); // Ambiente Verde tenue
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), lampColors[1].r, lampColors[1].g, lampColors[1].b);       // Difuso Verde
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), lampColors[1].r, lampColors[1].g, lampColors[1].b);      // Especular Verde
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.09f); // Atenuación ejemplo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.032f); // Atenuación ejemplo
-
-		//// Point light 2 (Azul)
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"), pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), lampColors[2].r * 0.1f, lampColors[2].g * 0.1f, lampColors[2].b * 0.1f); // Ambiente Azul tenue
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), lampColors[2].r, lampColors[2].g, lampColors[2].b);       // Difuso Azul
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), lampColors[2].r, lampColors[2].g, lampColors[2].b);      // Especular Azul
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f); // Atenuación ejemplo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f); // Atenuación ejemplo
-
-		//// Point light 3 (Blanco)
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].position"), pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].ambient"), lampColors[3].r * 0.1f, lampColors[3].g * 0.1f, lampColors[3].b * 0.1f); // Ambiente Blanco tenue
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].diffuse"), lampColors[3].r, lampColors[3].g, lampColors[3].b);       // Difuso Blanco
-		//glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].specular"), lampColors[3].r, lampColors[3].g, lampColors[3].b);      // Especular Blanco
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].constant"), 1.0f);
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].linear"), 0.09f); // Atenuación ejemplo
-		//glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].quadratic"), 0.032f); // Atenuación ejemplo
-
 
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), lightColor.x, lightColor.y, lightColor.z);
@@ -1462,8 +1535,6 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f);
-
-
 
 		// Point light 2
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
@@ -1524,12 +1595,48 @@ int main()
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 modelTemp = glm::mat4(1.0f);
 
+		/*
+================================================================================
+	RENDERIZADO DE ESCENARIOS Y ESTRUCTURAS
+================================================================================
 
-		// ---------------------------------------------------------------------------------
-		// 							DIBUJO DE ESCENARIOS
-		// ---------------------------------------------------------------------------------
+FUNCIÓN DibujarPiso():
+	Parámetros:
+	- textureID: ID de textura a aplicar
+	- posicion: Centro del objeto en espacio mundo
+	- escala: Tamaño final (x, y, z)
+	- VAO_Cubo: Geometría a renderizar
+	- modelLoc: Location del uniform "model" en shader
 
-		// DIBUJO DEL PISO GENERAL LADRILLO
+PISOS RENDERIZADOS:
+	1. Piso General (Ladrillo): Base 25x25 unidades
+	2. Piso Entrada (Pasto): 25x10 unidades, desplazado en Z
+	4. Piso Selva: Cuadrante +X, +Z
+	5. Piso Sabana: Cuadrante -X, -Z
+	6. Piso Desierto: Cuadrante -X, +Z
+	7. Piso Hábitat Pandas: Cuadrante +X, -Z
+	8. Piso Estanque: Área alrededor del estanque
+	9. Piso Acuario: Zona del acuario
+
+PAREDES:
+	- Altura: 1.9 unidades
+	- Espesor: 0.2 unidades
+	- Disposición: Perimetral + apertura de entrada
+	- Texturas con UV escaladas para realismo
+
+PERSONAJE EN TERCERA PERSONA:
+	- Solo visible cuando camera.GetCameraType() == THIRD_PERSON
+	- Rotación calculada desde cameraFront (atan2)
+	- Posición sincronizada con cámara
+
+*/
+
+
+// ---------------------------------------------------------------------------------
+// 							DIBUJO DE ESCENARIOS
+// ---------------------------------------------------------------------------------
+
+// DIBUJO DEL PISO GENERAL LADRILLO
 
 		lightingShader.Use();
 		DibujarPiso(pisoTextureID, glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(25.0f, 0.1f, 25.0f), VAO_Cubo, modelLoc);
@@ -1632,11 +1739,9 @@ int main()
 		Naruto.Draw(lightingShader);
 
 		// =================================================================================
-		// 				DIBUJO DE PERSONAJES ANIMADOS MIXAMO (TODOS)
-		//				Aqui van todos los modelos fbx o dae con animaciones
+		// 				DIBUJO DE PERSONAJES ANIMADOS
 		// =================================================================================
 
-		// ========== ACTIVAR SHADER DE ANIMACIÓN es una sola vez para todos los personajes ==========
 		animShader.Use();
 
 		// Configurar matrices de proyección y vista
@@ -1655,7 +1760,7 @@ int main()
 		animShader.setVec3("light.direction", glm::vec3(-0.4f, -1.0f, -0.2f));
 		animShader.setVec3("viewPos", camera.GetPosition());
 
-		// ========== PERSONAJE 1: BAILARÍN ==========
+		// ========== PERSONAJE 1 ==========
 		glm::mat4 modelAnim1 = glm::mat4(1.0f);
 		modelAnim1 = glm::translate(modelAnim1, personajeMixamoPos);
 		modelAnim1 = glm::rotate(modelAnim1, glm::radians(rotPersonajeMixamo), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1675,13 +1780,7 @@ int main()
 		// 							DIBUJO DE PANDAS
 		// ---------------------------------------------------------------------------------
 
-		// ========== EJEMPLO PANDA 1: ==========
-		//glm::mat4 panda1 = glm::mat4(1.0f);
-		//panda1 = glm::translate(panda1, panda1Pos);
-		//panda1 = glm::rotate(panda1, glm::radians(rotPanda1), glm::vec3(0.0f, 1.0f, 0.0f));
-		//panda1 = glm::scale(panda1, glm::vec3(panda1Scale));
-		//animShader.setMat4("model", panda1);
-		//animacionPanda1.Draw(animShader); 
+
 		//Oso
 		glm::mat4 Oso1 = glm::mat4(1.0f);
 		Oso1 = glm::translate(Oso1, osoPosActual);
@@ -1707,8 +1806,6 @@ int main()
 		animacionPanda2.Draw(animShader);
 
 
-
-
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE CAMELLO
 		// ---------------------------------------------------------------------------------
@@ -1719,17 +1816,14 @@ int main()
 		animShader.setMat4("model", camello1);
 		animacionCamello.Draw(animShader);
 
-
-
-		// ========== VOLVER AL SHADER DE ILUMINACIÓN esto se deja hasta el final siempre ==========
 		lightingShader.Use();
 
-		 //=================================================================================
-		 			//				DIBUJO DE MODELOS - BANCAS
-		 //=================================================================================
+		//=================================================================================
+		//				DIBUJO DE MODELOS - BANCAS
+		//=================================================================================
 
 
-		// --- Banca 2 (Camino Izquierdoo) ---
+	   // --- Banca 2 (Camino Izquierdoo) ---
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(-11.5f, -0.5f, 0.0f));
 		model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1817,10 +1911,10 @@ int main()
 		//// DIBUJO PISO HABITAT DE PANDAS ***
 		DibujarPiso(pisoPandasTextureID, glm::vec3(0.0f, -0.49f, -21.0f), glm::vec3(9.5f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
-//		// ---------------------------------------------------------------------------------
-//		// 							DIBUJO DE TIBURÓN (ESTANQUE)
-//		// ---------------------------------------------------------------------------------
-//
+		// ---------------------------------------------------------------------------------
+		// 							DIBUJO DE TIBURÓN (ESTANQUE)
+		// ---------------------------------------------------------------------------------
+
 		//// DIBUJO PISO TIBURÓN (TIBURON) ***
 		DibujarPiso(pisoEstanqueTextureID, glm::vec3(10.0f, -0.49f, -21.0f), glm::vec3(5.1f, 0.1f, 9.5f), VAO_Cubo, modelLoc);
 
@@ -1832,7 +1926,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Tiburon_Cuerpo.Draw(lightingShader);
 
-		// Cola (pivot en la base de la cola donde se une al cuerpo)
+		// Cola 
 		glm::vec3 tiburonPivotCola(0.0f, 0.0f, -0.5f); // Ajusta según tu modelo
 		model = modelTemp;
 		model = glm::translate(model, tiburonPivotCola);
@@ -1906,14 +2000,14 @@ int main()
 		Medusa.Draw(lightingShader);
 
 		/// ========================================
-		// ANIMACIÓN DEL TIBURÓN (Primero nada, luego salta)
+		// ANIMACIÓN DEL TIBURÓN
 		// ========================================
 		if (animarTiburon)
 		{
 			float t = glfwGetTime() - startTimeTiburon;
 
 			// ====================================
-			// PRIMERA ETAPA: SOLO NADA (0 a 2 s)
+			// PRIMERA ETAPA: SOLO NADA
 			// ====================================
 			if (t < 2.0f)
 			{
@@ -1930,7 +2024,7 @@ int main()
 				// CICLO NORMAL: NADA + SALTA
 				// ====================================
 				float t2 = t - 2.0f;
-				float ciclo = fmod(t2, 5.0f); // <--- CICLO TOTAL MÁS LARGO (5s)
+				float ciclo = fmod(t2, 5.0f);
 
 				// Movimiento lateral
 				float movX = sin(t2 * 1.2f) * 0.3f;
@@ -1942,14 +2036,14 @@ int main()
 				// ----------- SALTO MÁS LARGO -----------
 				if (ciclo < 1.0f)
 				{
-					// SUBE más suavemente (1 segundo)
-					float j = ciclo / 1.0f;  // 0 → 1
-					tiburonPos.y = 0.5f + j * 2.5f; // sube más suave y alto
+					// SUBE más suavemente
+					float j = ciclo / 1.0f;
+					tiburonPos.y = 0.5f + j * 2.5f;
 				}
 				else if (ciclo < 1.6f)
 				{
 					// BAJA suave (0.6 segundos)
-					float j = (ciclo - 1.0f) / 0.6f; // 0 → 1
+					float j = (ciclo - 1.0f) / 0.6f;
 					tiburonPos.y = (0.5f + 2.5f) - j * 2.5f;
 				}
 				else
@@ -1980,14 +2074,14 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
 
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(4.0f, -0.5f, -27.9f)); 
+		model = glm::translate(model, glm::vec3(4.0f, -0.5f, -27.9f));
 		model = glm::scale(model, glm::vec3(0.87f, 0.8f, 1.209f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texAgua);
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "alpha"), 0.4f); 
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "alpha"), 0.4f);
 
 		AguaA.Draw(lightingShader);
 
@@ -2120,10 +2214,10 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 
 		// =================================================================================
-	// 							ANIMACION DE ANIMALES - AVIARIO (CENTRO)
-	// =================================================================================
+		// 							ANIMACION DE ANIMALES - AVIARIO (CENTRO)
+		// =================================================================================
 
-	// Hacemos que el ave aletee y mueva la cabeza
+		// Hacemos que el ave aletee y mueva la cabeza
 		float t_aves = glfwGetTime();
 
 		// Aleteo (de -1 a 1 y de vuelta)
@@ -2134,11 +2228,11 @@ int main()
 		// Movimiento de cabeza (m�s lento)
 		rotCabeza = sin(t_aves * 1.5f) * 5.0f; // Gira 15 grados a los lados
 
-		 //=================================================================================
- 		//					ANIMACIÓN VENADO (Patrulla Lineal Continua)
- //=================================================================================
+		//=================================================================================
+		//					ANIMACIÓN VENADO
+		//=================================================================================
 
- //Usamos el tiempo global para un bucle infinito automático
+	 //Usamos el tiempo global para un bucle infinito automático
 		float t_venado = glfwGetTime();
 
 		// --- Configuración del recorrido ---
@@ -2153,28 +2247,23 @@ int main()
 		// --- Calcular frame de animación FBX ---
 		float frameActualVenado = fmod(t_venado * VENADO_FPS, (float)VENADO_FRAME_WALK_END);
 
-		// --- MÁQUINA DE ESTADOS CORREGIDA ---
-		// Base de rotación: 270.0f (Mirando hacia +Z)
-
-		// 1. CAMINAR HACIA +Z (IDA)
 		if (t_loop < timeWalk)
 		{
 			float phase = t_loop / timeWalk;
 
-			// Avanza en Z
 			venadoPosActual.z = glm::mix(venadoPosBase.z, venadoPosBase.z + dist, phase);
 			venadoPosActual.x = venadoPosBase.x;
 
-			rotVenado = 270.0f; // Mantiene rotación inicial (mirando al frente)
+			rotVenado = 270.0f;
 		}
-		// 2. MEDIA VUELTA (Girar 180 grados a la derecha)
+
 		else if (t_loop < timeWalk + timeTurn)
 		{
 			float phase = (t_loop - timeWalk) / timeTurn;
 
 			venadoPosActual.z = venadoPosBase.z + dist; // Quieto en el final
 
-			// Gira 
+
 			// Usamos interpolación lineal
 			rotVenado = glm::mix(270.0f, 90.0f, phase);
 		}
@@ -2186,9 +2275,9 @@ int main()
 			// Regresa en Z
 			venadoPosActual.z = glm::mix(venadoPosBase.z + dist, venadoPosBase.z, phase);
 
-			rotVenado = 90.0f; // Mirando hacia atrás (opuesto a 270)
+			rotVenado = 90.0f;
 		}
-		// 4. MEDIA VUELTA FINAL (Girar para reiniciar)
+
 		else
 		{
 			float phase = (t_loop - ((timeWalk * 2) + timeTurn)) / timeTurn;
@@ -2199,22 +2288,22 @@ int main()
 			rotVenado = glm::mix(90.0f, -90.0f, phase);
 		}
 		// =================================================================================
-		// 							ANIMACIÓN PANDA 1 (Cuadrado Corto)
+		// 							ANIMACIÓN PANDA 1
 		// =================================================================================
 		if (animarPanda1FBX)
 		{
 			float t = glfwGetTime() - startTimePanda1FBX;
 
 			// --- Configuración del recorrido ---
-			float dist = 5.0f;        // <-- CAMBIO: Distancia reducida a la mitad (antes 10.0f)
-			float timeWalk = 2.0f;    // <-- CAMBIO: Tiempo reducido a la mitad para mantener velocidad (antes 4.0f)
-			float timeTurn = 1.0f;    // Tiempo girando (igual)
+			float dist = 5.0f;
+			float timeWalk = 2.0f;
+			float timeTurn = 1.0f;
 
-			// Ciclo total: 4 caminatas + 4 giros
+
 			float totalLoopTime = (timeWalk + timeTurn) * 4.0f;
 			float t_loop = fmod(t, totalLoopTime);
 
-			// --- Calcular frame de animación FBX (Caminar) ---
+
 			float frameActual = fmod(t * PANDA1_FPS, (float)PANDA1_FRAME_WALK_END);
 
 			// --- Máquina de Estados del Recorrido ---
@@ -2231,8 +2320,8 @@ int main()
 			else if (t_loop < timeWalk + timeTurn)
 			{
 				float phase = (t_loop - timeWalk) / timeTurn;
-				panda1PosActual.z = panda1Pos.z + dist; // Mantiene posición final
-				rotPanda1 = glm::mix(270.0f, 180.0f, phase); // Gira de 270 a 180
+				panda1PosActual.z = panda1Pos.z + dist;
+				rotPanda1 = glm::mix(270.0f, 180.0f, phase);
 			}
 			// 3. CAMINAR HACIA -X
 			else if (t_loop < (timeWalk * 2) + timeTurn)
@@ -2279,9 +2368,6 @@ int main()
 				panda1PosActual.x = panda1Pos.x;
 				rotPanda1 = glm::mix(0.0f, -90.0f, phase); // Gira de 0 a -90
 			}
-
-			// (Opcional) Pasar datos al shader de animación si tu clase lo requiere
-			// animShader.setFloat("time", t); 
 		}
 		else
 		{
@@ -2306,7 +2392,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(textAgua));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Agua.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
 		//modelo IGLU
@@ -2319,7 +2404,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(Iglu3d));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		iglu.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
 		//modelo huevo
@@ -2332,7 +2416,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pingu));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		huevo.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
 		//modelo pino
@@ -2340,15 +2423,11 @@ int main()
 		nievePino = glm::translate(nievePino, glm::vec3(2.9f, 1.15f, -3.1f));
 		nievePino = glm::rotate(nievePino, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		nievePino = glm::scale(nievePino, glm::vec3(3.2f, 3.2f, 3.2f));
-		//glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(nievePino));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		pino.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
-
-
 
 
 		// **** DIBUJO DE ANIMALES ACUARIO ****
@@ -2360,26 +2439,26 @@ int main()
 			float t = glfwGetTime() - startTimeFoca;
 
 			// --- Parámetros de la Animación ---
-			float moveDuration = 4.0f; // 6 segundos de avance
-			float turnDuration = 1.0f; // 1 segundo para girar
-			float totalLoopTime = (moveDuration + turnDuration) * 2.0f; // 14 segundos en total
-			float t_loop = fmod(t, totalLoopTime); // Tiempo en el bucle actual (0 a 14)
+			float moveDuration = 4.0f;
+			float turnDuration = 1.0f;
+			float totalLoopTime = (moveDuration + turnDuration) * 2.0f;
+			float t_loop = fmod(t, totalLoopTime);
 
-			float moveDist = 6.0f; // Qué tan lejos avanza (distancia total del recorrido)
-			float aleteoVelocidad = 4.0f; // Velocidad de aleteo (patas)
-			float colaVelocidad = 2.2f; // Velocidad de cola
+			float moveDist = 6.0f;
+			float aleteoVelocidad = 4.0f;
+			float colaVelocidad = 2.2f;
 
-			// --- Amplitudes SUTILES (Corregidas) ---
-			float ampPata = 8.0f;      // Amplitud Patas (Reducido de 25)
-			float ampColaMedio = 2.0f; // Amplitud Media (Como tu código anterior)
-			float ampColaFin = 3.0f;   // Amplitud Cola (Un poco más que el medio)
+			// --- Amplitudes ---
+			float ampPata = 8.0f;      // Amplitud Patas 
+			float ampColaMedio = 2.0f; // Amplitud Media 
+			float ampColaFin = 3.0f;   // Amplitud Cola 
 
 
-			// --- Máquina de Estados (Corregida) ---
-			if (t_loop < moveDuration) // --- Estado 1: Mover a +Z (0 a 6 seg) ---
+			// --- Máquina de Estados  ---
+			if (t_loop < moveDuration)
 			{
 				float phase = t_loop / moveDuration; // 0.0 a 1.0
-				focaPosActual.z = focaPosBase.z + (phase * moveDist); // Avanza hacia -Z (acercándose)
+				focaPosActual.z = focaPosBase.z + (phase * moveDist);
 				focaPosActual.x = focaPosBase.x; // X se mantiene
 				focaRotY = -90.0f; // Mirando hacia -Z
 
@@ -2390,7 +2469,7 @@ int main()
 				rotFocaMedio = sin(t * colaVelocidad) * ampColaMedio;
 				rotFocaCola = sin(t * colaVelocidad + 0.6f) * ampColaFin;
 			}
-			else if (t_loop < moveDuration + turnDuration) // --- Estado 2: Giro 1 (6 a 7 seg) ---
+			else if (t_loop < moveDuration + turnDuration)
 			{
 				focaPosActual.z = focaPosBase.z + moveDist; // Se queda en el destino
 				float phase = (t_loop - moveDuration) / turnDuration; // 0.0 a 1.0
@@ -2400,14 +2479,14 @@ int main()
 				rotFocaPataDer = 0.0f; rotFocaPataIzq = 0.0f;
 				rotFocaMedio = 0.0f; rotFocaCola = 0.0f;
 			}
-			else if (t_loop < (moveDuration * 2.0f) + turnDuration) // --- Estado 3: Mover a -Z (7 a 13 seg) ---
+			else if (t_loop < (moveDuration * 2.0f) + turnDuration)
 			{
 				float phase = (t_loop - (moveDuration + turnDuration)) / moveDuration; // 0.0 a 1.0
 				focaPosActual.z = (focaPosBase.z + moveDist) - (phase * moveDist); // Regresa a pos inicial
 				focaPosActual.x = focaPosBase.x;
 				focaRotY = 90.0f; // Mirando hacia -Z
 
-				// Aleteo Patas (en Eje X)
+
 				rotFocaPataDer = sin(t * aleteoVelocidad) * ampPata;
 				rotFocaPataIzq = -sin(t * aleteoVelocidad) * ampPata;
 				// Aleteo Cola (en Eje Z - Vertical)
@@ -2427,7 +2506,6 @@ int main()
 		}
 		else
 		{
-			// Resetear a posición inicial si no está animada
 			focaPosActual = focaPosBase;
 			focaRotY = -90.0f; // Listo para empezar (mirando a +Z)
 			rotFocaMedio = 0.0f;
@@ -2435,50 +2513,43 @@ int main()
 			rotFocaPataDer = 0.0f;
 			rotFocaPataIzq = 0.0f;
 		}
-
-
-		// Jerarquía: Cuerpo -> Medio -> Cola
-		//          y: Cuerpo -> AletaDer
-		//          y: Cuerpo -> AletaIzq
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 
-		// 1. CUERPO (Padre Principal) [Foca1]
 		glm::mat4 modelCuerpo = glm::mat4(1.0f);
 		modelCuerpo = glm::translate(modelCuerpo, focaPosActual); // Mover a la posición animada
-		modelCuerpo = glm::rotate(modelCuerpo, glm::radians(focaRotY), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación animada
-		modelCuerpo = glm::scale(modelCuerpo, glm::vec3(FocaScale)); // Escala general
+		modelCuerpo = glm::rotate(modelCuerpo, glm::radians(focaRotY), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelCuerpo = glm::scale(modelCuerpo, glm::vec3(FocaScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCuerpo));
 		Foca1.Draw(lightingShader); // Dibuja Cuerpo
 
-		// 2. MEDIO (Hijo del Cuerpo) [FocaCo]
 		glm::mat4 modelMedio = modelCuerpo; // Hereda
-		glm::vec3 pivotMedio = glm::vec3(0.0f, 0.0f, -1.0f); // ¡AJUSTA ESTO!
+		glm::vec3 pivotMedio = glm::vec3(0.0f, 0.0f, -1.0f);
 		modelMedio = glm::translate(modelMedio, pivotMedio);
-		modelMedio = glm::rotate(modelMedio, glm::radians(rotFocaMedio), glm::vec3(0.0f, 0.0f, 1.0f)); // <-- CORREGIDO: Rotar en Eje Z (Vertical)
+		modelMedio = glm::rotate(modelMedio, glm::radians(rotFocaMedio), glm::vec3(0.0f, 0.0f, 1.0f));
 		modelMedio = glm::translate(modelMedio, -pivotMedio);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMedio));
 		FocaCo.Draw(lightingShader); // Dibuja Medio
 
-		// 3. COLA (Hijo del Medio) [FocaMe]
+
 		glm::mat4 modelCola = modelMedio; // Hereda
 		glm::vec3 pivotCola = glm::vec3(0.0f, 0.0f, -0.8f);
 		modelCola = glm::translate(modelCola, pivotCola);
-		modelCola = glm::rotate(modelCola, glm::radians(rotFocaCola), glm::vec3(0.0f, 0.0f, 1.0f)); // <-- CORREGIDO: Rotar en Eje Z (Vertical)
+		modelCola = glm::rotate(modelCola, glm::radians(rotFocaCola), glm::vec3(0.0f, 0.0f, 1.0f));
 		modelCola = glm::translate(modelCola, -pivotCola);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCola));
 		FocaMe.Draw(lightingShader); // Dibuja Cola
 
 		// 4. ALETA DERECHA (Hijo del Cuerpo) [FocaDer]
-		glm::mat4 FocaPataDerecha = modelCuerpo; // Hereda del CUERPO
+		glm::mat4 FocaPataDerecha = modelCuerpo;
 		glm::vec3 pivotPataDer = glm::vec3(0.3f, 0.1f, -0.2f);
 		FocaPataDerecha = glm::translate(FocaPataDerecha, pivotPataDer);
-		FocaPataDerecha = glm::rotate(FocaPataDerecha, glm::radians(rotFocaPataDer), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotar en Z (Aleteo)
+		FocaPataDerecha = glm::rotate(FocaPataDerecha, glm::radians(rotFocaPataDer), glm::vec3(0.0f, 0.0f, 1.0f));
 		FocaPataDerecha = glm::translate(FocaPataDerecha, -pivotPataDer);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(FocaPataDerecha));
 		FocaDer.Draw(lightingShader); // Dibuja Aleta Derecha
 
-		// 5. ALETA IZQUIERDA (Hijo del Cuerpo) [FocaIzq]
+
 		glm::mat4 FocaPataIzq = modelCuerpo; // Hereda del CUERPO
 		glm::vec3 pivotPataIzq = glm::vec3(-0.3f, 0.1f, -0.2f);
 		FocaPataIzq = glm::translate(FocaPataIzq, pivotPataIzq);
@@ -2490,7 +2561,6 @@ int main()
 		glBindVertexArray(0); // Desvincular al final
 
 
-		//fin de foca
 		// -------Inicio Delfin ----------
 
 		if (animarDelfin)
@@ -2549,10 +2619,9 @@ int main()
 		}
 		else
 		{
-			// Resetear a posición inicial si no está animada
 			delfinPosActual = delfinPosBase;
 			delfinRotX = 0.0f;
-			delfinRotY = 0.0f; // Mirando hacia +X (listo para empezar)
+			delfinRotY = 0.0f;
 		}
 
 		glm::mat4 delfin = glm::mat4(1.0f);
@@ -2606,21 +2675,16 @@ int main()
 		arm1.Draw(lightingShader);
 		glBindVertexArray(0);
 
-		// Ala Izquierda (arm2)
-		// Nota: El código original tenía un error, usaba PinguinoDer como base para PinguinoIzq
 		glm::mat4 PinguinoIzq = glm::mat4(1.0f);
 		PinguinoIzq = glm::translate(PinguinoIzq, PinguinoPos); // 1. Mover a la posición base
 		PinguinoIzq = glm::rotate(PinguinoIzq, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // 2. Rotar base
 
-		// *** APLICAR ANIMACIÓN DE ALATEO (Rotación en Eje Z) ***
 		PinguinoIzq = glm::rotate(PinguinoIzq, glm::radians(PinAlaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		PinguinoIzq = glm::scale(PinguinoIzq, glm::vec3(PinScale)); // 4. Escalar
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(PinguinoIzq));
 		arm2.Draw(lightingShader);
 		glBindVertexArray(0);
-
-		// --- FIN PINGUINO ---
 
 
 		// ---------------------------------------------------------------------------------
@@ -3632,8 +3696,6 @@ int main()
 		if (animarCamelloFBX)
 		{
 			float t = glfwGetTime() - startTimeCamelloFBX;
-
-			// --- Calcular frame actual de la animación ---
 			float frameActual = t * CAMELLO_FPS;
 			if (frameActual >= CAMELLO_FRAME_TOTAL) {
 				startTimeCamelloFBX = glfwGetTime();
@@ -3783,20 +3845,12 @@ int main()
 
 		lightingShader.Use(); // shader de iluminación 
 
-		//-----------------------------------------------------------------
-		//------MODELOS HECHOS EN OPENGL:  --------
 
-
-		// --- Bancas de Centro Comercial (Fila) ---
 		// Creamos 5 bancas separadas por 4 unidades en el eje X
 		for (int i = 0; i < 7; i++)
 		{
 			glm::mat4 modeloBanca = glm::mat4(1.0f);
 
-			// 1. Traslación:
-			// X: Empieza en -3.0 y suma 4.0 por cada iteración (i * 4.0)
-			// Y: Bajamos a -0.6f (estaba en -0.09f)
-			// Z: Se mantiene en -30.0f
 			modeloBanca = glm::translate(modeloBanca, glm::vec3(-7.0f + (i * 3.0f), -0.5f, -30.0f));
 
 			// 2. Rotación: 90 grados en Y
@@ -3808,7 +3862,7 @@ int main()
 			// Dibujar
 			dibujarBancaCentroComercial(modeloBanca, modelLoc, VAO_Cubo, grisTextureID);
 		};
-		
+
 
 		// ========================================================================
 		//								DIBUJAR SKYBOX
@@ -3832,8 +3886,6 @@ int main()
 		glfwSwapBuffers(window);
 	}
 
-
-	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
 
 
@@ -3842,25 +3894,39 @@ int main()
 }
 
 
-// --- Función para configurar VAO/VBO genérico ---
+/*
+================================================================================
+	FUNCIÓN: ConfigurarVAO
+================================================================================
+PROPÓSITO:
+	Configura un Vertex Array Object con sus datos de geometría
+
+PARÁMETROS:
+	- VAO: Referencia al ID del VAO (salida)
+	- VBO: Referencia al ID del VBO (salida)
+	- vertices: Puntero al array de datos de vértices
+	- size: Tamaño en bytes del array
+
+PROCESO:
+	1. Genera y vincula VAO
+	2. Genera y llena VBO con datos
+	3. Configura punteros de atributos:
+	   - Posición (3 floats, offset 0)
+	   - Normal (3 floats, offset 3*sizeof(float))
+	   - UV (2 floats, offset 6*sizeof(float))
+	4. Desvincula VAO
+*/
 void ConfigurarVAO(GLuint& VAO, GLuint& VBO, float* vertices, size_t size)
 {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
-
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-
-	// Atributo de Posición (Location 0)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
-	// Atributo de Normal (Location 1)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	// Atributo de Coordenadas de Textura (Location 2)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
@@ -3868,7 +3934,25 @@ void ConfigurarVAO(GLuint& VAO, GLuint& VBO, float* vertices, size_t size)
 }
 
 
-// --- Función para configurar los parametros del piso de textura repetible ---
+/*
+================================================================================
+	FUNCIÓN: ConfigurarTexturaRepetible
+================================================================================
+PROPÓSITO:
+	Establece parámetros de wrapping y filtering para texturas
+
+PARÁMETROS:
+	- textureID: ID de la textura ya cargada
+
+CONFIGURACIÓN:
+	- WRAP_S/WRAP_T: GL_REPEAT (permite tiling)
+	- MIN_FILTER: GL_LINEAR_MIPMAP_LINEAR (trilinear)
+	- MAG_FILTER: GL_LINEAR (bilinear)
+
+RESULTADO:
+	Textura optimizada para superficies grandes sin distorsión
+*/
+
 void ConfigurarTexturaRepetible(GLuint textureID)
 {
 	glBindTexture(GL_TEXTURE_2D, textureID);
@@ -3880,8 +3964,33 @@ void ConfigurarTexturaRepetible(GLuint textureID)
 }
 
 
+/*
+================================================================================
+	FUNCIÓN: DibujarPiso
+================================================================================
+PROPÓSITO:
+	Renderiza una superficie con textura aplicada
 
-// --- Función para dibujar pisos con textura ---
+PARÁMETROS:
+	- textureID: Textura a aplicar
+	- posicion: Posición central del objeto
+	- escala: Dimensiones (x, y, z)
+	- VAO_Cubo: Geometría a usar
+	- modelLoc: Location del uniform "model"
+
+PROCESO:
+	1. Activa y vincula textura en units 0 y 1
+	2. Vincula VAO
+	3. Habilita atributos de vértice
+	4. Construye matriz model (traslación + escala)
+	5. Envía matriz al shader
+	6. Dibuja 36 vértices (12 triángulos = 6 caras)
+	7. Desvincula VAO
+
+USO:
+	Llamar para cada superficie (pisos, paredes, etc.)
+*/
+
 void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc)
 {
 	// Activar y enlazar la textura
@@ -3910,96 +4019,120 @@ void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint 
 	glBindVertexArray(0);
 }
 
+/*
+================================================================================
+	FUNCIÓN: DoMovement
+================================================================================
+PROPÓSITO:
+	Procesa el estado del teclado y ejecuta acciones correspondientes
 
-// Moves/alters the camera positions based on user input
+SECCIONES:
+
+1. CONTROLES DE CÁMARA:
+   - W/Arriba: Avanzar (FORWARD)
+   - S/Abajo: Retroceder (BACKWARD)
+   - A/Izquierda: Lateral izquierda (LEFT)
+   - D/Derecha: Lateral derecha (RIGHT)
+   - Movimiento multiplicado por deltaTime para suavidad
+
+2. CAMBIO DE VISTA:
+   - TAB: Alterna entre FIRST_PERSON y THIRD_PERSON
+   - Flag teclaTAB_presionada evita múltiples toggles
+   - Imprime estado actual en consola
+
+ 3. ANIMACIONES DE ANIMALES:
+   - Q: Activa/desactiva animación del cóndor
+   - X: Activa/desactiva animación de la tortuga
+   - P: Activa/desactiva animación de la capibara
+   - N: Activa/desactiva animación del mono
+   - O: Activa/desactiva animación de la guacamaya
+   - I: Activa/desactiva animación del tiburón
+   - V: Activa/desactiva animación del elefante
+   - Cada tecla tiene su flag para evitar múltiples toggles
+
+   */
 void DoMovement()
 {
 
 	// Camera controls
-	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
-	{
+	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP]) {
 		camera.ProcessKeyboard(FORWARD, deltaTime);
-
 	}
-
-	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
-	{
+	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN]) {
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
-
-
 	}
-
-	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
-	{
+	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT]) {
 		camera.ProcessKeyboard(LEFT, deltaTime);
-
-
 	}
-
-	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
-	{
+	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT]) {
 		camera.ProcessKeyboard(RIGHT, deltaTime);
-
-
 	}
-
-
-	if (keys[GLFW_KEY_H])
-	{
+	if (keys[GLFW_KEY_H]) {
 		pointLightPositions[0].y -= 0.01f;
 	}
-	if (keys[GLFW_KEY_U])
-	{
+	if (keys[GLFW_KEY_U]) {
 		pointLightPositions[0].z -= 0.1f;
 	}
-	if (keys[GLFW_KEY_J])
-	{
+	if (keys[GLFW_KEY_J]) {
 		pointLightPositions[0].z += 0.01f;
 	}
 
 }
 
-// Is called whenever a key is pressed/released via GLFW
+/*
+================================================================================
+	FUNCIÓN: KeyCallback
+================================================================================
+PROPÓSITO:
+	Callback de GLFW para eventos discretos de teclado
+
+PARÁMETROS:
+	- window: Ventana que generó el evento
+	- key: Código de la tecla
+	- scancode: Código dependiente del sistema
+	- action: GLFW_PRESS, GLFW_RELEASE o GLFW_REPEAT
+	- mode: Modificadores (Shift, Ctrl, Alt)
+
+FUNCIONALIDAD:
+	- ESC: Cierra la ventana
+	- Actualiza array keys[] con estado de teclas (0-1023)
+	- ESPACIO: Toggle de luz animada central
+	  * Activa: Color amarillo oscilante
+	  * Desactiva: Sin color (negro)
+
+NOTA: Complementa DoMovement() que procesa estado continuo
+*/
+
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
-	{
+	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
-	if (key >= 0 && key < 1024)
-	{
-		if (action == GLFW_PRESS)
-		{
+	if (key >= 0 && key < 1024) {
+		if (action == GLFW_PRESS) {
 			keys[key] = true;
 		}
-		else if (action == GLFW_RELEASE)
-		{
+		else if (action == GLFW_RELEASE) {
 			keys[key] = false;
 		}
 	}
 
-	if (keys[GLFW_KEY_SPACE])
-	{
+	if (keys[GLFW_KEY_SPACE]) {
 		active = !active;
-		if (active)
-		{
+		if (active) {
 			Light1 = glm::vec3(1.0f, 1.0f, 0.0f);
 		}
-		else
-		{
-			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
+		else {
+			Light1 = glm::vec3(0);
 		}
 	}
 
-	if (keys[GLFW_KEY_TAB])
-	{
-		if (!teclaTAB_presionada)
-		{
+	if (keys[GLFW_KEY_TAB]) {
+		if (!teclaTAB_presionada) {
 			camera.ToggleCameraType();
 			teclaTAB_presionada = true;
 
-			// Feedback en consola para saber en qué modo estás
 			if (camera.GetCameraType() == FIRST_PERSON)
 				std::cout << "Camara: PRIMERA PERSONA" << std::endl;
 			else if (camera.GetCameraType() == THIRD_PERSON)
@@ -4038,7 +4171,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	//CAPIBARA (Tecla P)
 	if (keys[GLFW_KEY_P])
 	{
-		if (!teclaP_presionada) // Reutilizas la variable que ya tienes
+		if (!teclaP_presionada)
 		{
 			animarCapibara = !animarCapibara;
 			startTimeCapibara = glfwGetTime();
@@ -4138,7 +4271,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	{
 		animarPinguino = !animarPinguino;
 		startTimePinguino = glfwGetTime(); // Guarda el tiempo de inicio
-		teclaC_presionada = true; // Evita que se reinicie si se deja presionada
+		teclaC_presionada = true;
 	}
 
 	else {
@@ -4150,7 +4283,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	{
 		animarFoca = !animarFoca;
 		startTimeFoca = glfwGetTime(); // Guarda el tiempo de inicio
-		teclaB_presionada = true; // Evita que se reinicie si se deja presionada
+		teclaB_presionada = true;
 	}
 	else {
 		teclaB_presionada = false;
@@ -4161,7 +4294,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	{
 		animarDelfin = !animarDelfin;
 		startTimeDelfin = glfwGetTime(); // Guarda el tiempo de inicio
-		teclaD_presionada = true; // Evita que se reinicie si se deja presionada
+		teclaD_presionada = true;
 	}
 	else {
 		teclaD_presionada = false;
@@ -4170,6 +4303,27 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 
 }
 
+/*
+================================================================================
+	FUNCIÓN: MouseCallback
+================================================================================
+PROPÓSITO:
+	Procesa movimiento del mouse para rotación de cámara
+
+PARÁMETROS:
+	- window: Ventana que generó el evento
+	- xPos: Posición X del cursor
+	- yPos: Posición Y del cursor
+
+PROCESO:
+	1. Inicialización en primera llamada (evita salto inicial)
+	2. Cálculo de offset: diferencia con posición anterior
+	3. Actualización de lastX/lastY
+	4. Envío de deltas a camera.ProcessMouseMovement()
+
+RESULTADO:
+	Rotación suave de cámara con sensibilidad ajustable en clase Camera
+*/
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
 	if (firstMouse)
@@ -4180,7 +4334,7 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 	}
 
 	GLfloat xOffset = xPos - lastX;
-	GLfloat yOffset = lastY - yPos;  // Reversed since y-coordinates go from bottom to left
+	GLfloat yOffset = lastY - yPos;
 
 	lastX = xPos;
 	lastY = yPos;
