@@ -1,4 +1,71 @@
-﻿#include <iostream>
+﻿/*
+================================================================================
+	PROYECTO FINAL - COMPUTACIÓN GRÁFICA
+	Zoológico Virtual Interactivo en OpenGL
+================================================================================
+
+DESCRIPCIÓN:
+	Simulación 3D de un zoológico virtual con múltiples hábitats (Acuario, Selva,
+	Sabana, Desierto, Aviario, Zona de Pandas). Incluye animaciones de animales, sistema de
+	iluminación dinámico, , skybox, audio, cámara intercambiable y renderizado con texturas.
+
+CARACTERÍSTICAS PRINCIPALES:
+	- Renderizado 3D con OpenGL 3.3
+	- Sistema de cámara en primera, tercera persona y formato libre.
+	- Animaciones jerárquicas para 12 especies de animales
+	- Animación desde mixamo de dos modelos diferentes (.dae)
+	- Animación desde blender mediante esqueleto y keyframes de cuatro modelos diferentes (.fbx)
+	- Sistema de iluminación con luces puntuales, luz direccional y luz tipo spotlight
+	- Skybox para ambiente inmersivo
+	- Texturas repetibles para pisos diferenciados por hábitat
+	- Audio de fondo con miniaudio
+	- Modelos 3D cargados desde archivos .obj, .fbx y .dae
+
+CONTROLES:
+	- W/A/S/D o Flechas: Movimiento de cámara
+	- Mouse: Rotación de cámara
+	- TAB: Cambiar entre primera/tercera persona
+	- ESPACIO: Activar luz central animada
+
+	Animaciones de animales:
+	- V: Elefante (Sabana)
+	- J: Jirafa (Sabana)
+	- L: Cebra (Sabana)
+	- Z: Cóndor (Desierto)
+	- X: Tortuga (Desierto)
+	- P: Capibara (Selva)
+	- N: Mono (Selva)
+	- O: Guacamaya (Selva)
+	- C: Pinguino (Acuario)
+	- B: Foca (Acuario)
+	- X: Delfín (Acuario)
+
+LIBRERÍAS UTILIZADAS:
+	- GLEW: Manejo de extensiones OpenGL
+	- GLFW: Gestión de ventanas y eventos
+	- GLM: Matemáticas para gráficos 3D
+	- SOIL2: Carga de texturas
+	- STB_IMAGE: Procesamiento de imágenes
+	- miniaudio: Reproducción de audio
+	- Assimp: Carga de modelos 3D
+	- Mixamo: Animaciones de personajes
+	- Blender: Modelado y animación 3D
+
+ESTRUCTURA DEL CÓDIGO:
+	1. Declaración de funciones y variables globales
+	2. Función main() - Inicialización y bucle de renderizado
+	3. Funciones auxiliares (ConfigurarVAO, ConfigurarTexturaRepetible, DibujarPiso)
+	4. Funciones de callbacks (DoMovement, KeyCallback, MouseCallback)
+
+AUTORES: -Uriel Benjamin De La Merced Soriano
+		 -Ana Isabel Diaz Bautista
+		 -Carlos Mario Hernandez Gutierrez
+
+FECHA: 4 de Diciembre 2025
+================================================================================
+*/
+
+#include <iostream>
 #include <cmath>
 
 // GLEW
@@ -34,21 +101,56 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
+/*
+================================================================================
+	FUNCIONES PROTOTIPO - CALLBACKS Y UTILIDADES
+================================================================================
+
+CALLBACKS DE GLFW:
+	- KeyCallback: Maneja eventos de teclado (presionar/soltar teclas)
+	- MouseCallback: Procesa movimiento del mouse para rotación de cámara
+	- DoMovement: Ejecuta movimientos de cámara y activa/desactiva animaciones
+
+FUNCIONES AUXILIARES DE RENDERIZADO:
+	- ConfigurarVAO: Configura Vertex Array Objects con sus VBOs para geometría
+	- ConfigurarTexturaRepetible: Establece parámetros de wrapping para texturas
+	- DibujarPiso: Renderiza superficies con texturas aplicadas y transformaciones
+*/
+
 // Funciones prototipo para callbacks
 void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
 
-
-// =================================================================================
-// 	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
-// =================================================================================
 //Configurar funciones para repetir textura de piso
 void ConfigurarVAO(GLuint& VAO, GLuint& VBO, float* vertices, size_t size);
 void ConfigurarTexturaRepetible(GLuint textureID);
 void DibujarPiso(GLuint textureID, glm::vec3 posicion, glm::vec3 escala, GLuint VAO_Cubo, GLint modelLoc);
 
+/*
+================================================================================
+	CONFIGURACIÓN INICIAL Y VARIABLES GLOBALES
+================================================================================
 
+PROPIEDADES DE VENTANA:
+	- WIDTH/HEIGHT: Dimensiones de la ventana (1280x720)
+	- SCREEN_WIDTH/SCREEN_HEIGHT: Dimensiones del framebuffer
+
+SISTEMA DE CÁMARA:
+	- camera: Objeto Camera inicializado en posición (0, 1, 21)
+	- teclaTAB_presionada: Control de alternancia entre cámaras
+	- lastX/lastY: Última posición del mouse para cálculo de delta
+	- keys[1024]: Array de estados de teclas
+	- firstMouse: Flag para inicialización de mouse
+
+SISTEMA DE ILUMINACIÓN:
+	- lightPos/lightPos2: Posiciones de luces auxiliares (legacy)
+	- pointLightPositions: Array de posiciones para luces puntuales
+
+CONTROL DE TIEMPO:
+	- deltaTime: Tiempo transcurrido entre frames (para movimiento suave)
+	- lastFrame: Timestamp del frame anterior
+*/
 
 // Propiedades de la ventana
 const GLuint WIDTH = 1000, HEIGHT = 800;
@@ -76,7 +178,35 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(-2.0f, 0.2f, -2.0f)   // Esquina 4 (Negativo X, Negativo Z)
 };
 
+/*
+================================================================================
+	SISTEMA DE ANIMACIÓN DE ANIMALES
+================================================================================
 
+ESTRUCTURA DE DATOS POR ANIMAL:
+	Cada animal tiene asociado:
+	- Variables de rotación para partes del cuerpo (rot*)
+	- Posición actual (XYZ) y rotación general
+	- Escala de renderizado
+	- Flags de control de animación (animar*)
+	- Variables de timing (startTime*)
+	- Flags de control de teclas (tecla*_presionada)
+
+TÉCNICA DE ANIMACIÓN:
+	- Animación jerárquica: El cuerpo es el padre, las extremidades son hijos
+	- Interpolación temporal: Uso de glfwGetTime() para ciclos suaves
+	- Transformaciones por pivote: Traslación al pivote -> Rotación -> Vuelta
+	- Estados de animación: Cada animal tiene fases (caminar, girar, detenerse, etc.)
+	- Animación por keyframes: Modelos desde blender en .fbx
+	- Animación por esqueleto: Modelos desde mixamo en .dae
+
+CUADRANTES DEL ZOOLÓGICO:
+	- ACUARIO (X, -Z): Pingüino, Tortuga, Nutria
+	- SELVA (X, Z): Capibara, Mono, Guacamaya
+	- SABANA (-X, -Z): Elefante, Jirafa, Cebra
+	- DESIERTO (-X, Z): Camello, Tortuga, Cóndor
+	- AVIARIO (Centro): Ave enjaulada
+*/
 
 // =================================================================================
 // 						ANIMACIÓN Y POSICIONES BASE DE ANIMALES
@@ -307,7 +437,27 @@ glm::vec3 tiburonPos = glm::vec3(9.0f, 0.5f, -23); // Ajusta la posición inicia
 bool animarTiburon = false;
 float startTimeTiburon = 0.0f;
 bool teclaI_presionada = false;
+/*
+	================================================================================
+		DATOS DE GEOMETRÍA - VÉRTICES DE PRIMITIVAS
+	================================================================================
 
+	FORMATO DE VÉRTICES:
+		Cada vértice contiene 8 floats:
+		- Posiciones (x, y, z): Coordenadas en espacio objeto
+		- Normales (nx, ny, nz): Vector perpendicular para iluminación
+		- Coordenadas UV (u, v): Mapeo de texturas
+
+	ARRAY vertices[]:
+		Define un cubo unitario centrado en origen
+		Usado para: Pisos, paredes base y geometría simple
+		Coordenadas UV ajustadas para repetición (0-10 en cara inferior/superior)
+
+	ARRAY verticesPared[]:
+		Cubo con coordenadas UV optimizadas para texturas de muro
+		Mayor repetición horizontal (0-15) que vertical (0-5)
+		Mantiene proporción realista de ladrillos/bloques
+	*/
 // Vértices para el piso
 float vertices[] = {
 	// Posiciones           // Normales           // Coordenadas de Textura (U, V)
@@ -428,7 +578,13 @@ glm::vec3 Light1 = glm::vec3(0);
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
+/*
+	================================================================================
+		FUNCIÓN CUBO DRAW 
+	================================================================================
 
+	Función para dibujar un cubo con transformaciones locales y de padre.
+	*/
 
 void cuboDraw(glm::mat4 parentModel, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID, float rotacion)
 {
@@ -465,6 +621,13 @@ void cuboDraw(glm::mat4 parentModel, glm::vec3 escala, glm::vec3 traslado, GLint
  * Consta de una barra central (mesa) y dos barras laterales (asientos).
  * Centrado en (0,0,0).
 */
+/*
+	================================================================================
+		FUNCIÓN DIBUJAR BANCA CENTRO COMERCIAL
+	================================================================================
+
+	función para dibujar un conjunto de mesa y bancas estilo centro comercial.
+	*/
 void dibujarBancaCentroComercial(glm::mat4 parentModel, GLint modelLoc, GLuint VAO_Cubo, GLuint texturaID)
 {
 	// --- Dimensiones Generales ---
@@ -532,6 +695,24 @@ void dibujarBancaCentroComercial(glm::mat4 parentModel, GLint modelLoc, GLuint V
 		glm::vec3(0.0f, altoSoporteBanca / 2.0f, separacion),
 		modelLoc, VAO_Cubo, texturaID, 0.0f);
 }
+/*
+================================================================================
+	FUNCIÓN MAIN - PUNTO DE ENTRADA DEL PROGRAMA
+================================================================================
+
+FASE 1: INICIALIZACIÓN DE GLFW Y CONTEXTO OPENGL
+	- Configuración de versión OpenGL 3.3
+	- Creación de ventana con título del proyecto
+	- Establecimiento de callbacks para input
+	- Desactivación del cursor
+
+FASE 2: INICIALIZACIÓN DE GLEW
+	- Carga de funciones OpenGL modernas
+	- Validación de extensiones disponibles
+
+FASE 3: CONFIGURACIÓN DE VIEWPORT
+	- Definición del área de renderizado
+*/
 
 
 int main()
