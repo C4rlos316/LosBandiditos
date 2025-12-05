@@ -282,6 +282,19 @@ glm::vec3 venadoPosActual = venadoPosBase;// Constantes de animación FBX
 const float VENADO_FPS = 30.0f;
 const int VENADO_FRAME_WALK_END = 200;
 
+// -----------------------------------------
+//  Habitat Pandas
+// -----------------------------------------
+// PANDA 1 
+float panda1Scale = 0.006f;
+float rotPanda1 = 270.0f;
+glm::vec3 panda1Pos = glm::vec3(2.8f, -0.4f, -24.0f);
+glm::vec3 panda1PosActual = panda1Pos;
+bool animarPanda1FBX = true;
+float startTimePanda1FBX = 0.0f;
+const float PANDA1_FPS = 30.0f;
+const int PANDA1_FRAME_WALK_END = 200;
+
 
 // -----------------------------------------
 //  TIBURÓN (ESTANQUE)
@@ -417,16 +430,22 @@ GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 
-void cuboDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID, float rotacion)
+void cuboDraw(glm::mat4 parentModel, glm::vec3 escala, glm::vec3 traslado, GLint uniformModel, GLuint VAO, GLuint texturaID, float rotacion)
 {
-	// 1. Configurar la matriz del modelo para esta parte
-	modelo = glm::mat4(1);
-	modelo = glm::translate(modelo, traslado);// primero traslaci�n
-	modelo = glm::rotate(modelo, rotacion, glm::vec3(0.0f, 1.0f, 0.0f)); // luego rotaci�n
-	modelo = glm::scale(modelo, escala); // finalmente escala
-	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelo));
+	// 1. Crear la transformación LOCAL de este cubo
+	glm::mat4 localModel = glm::mat4(1.0f);
+	localModel = glm::translate(localModel, traslado); // primero traslación
+	localModel = glm::rotate(localModel, rotacion, glm::vec3(0.0f, 1.0f, 0.0f)); // luego rotación
+	localModel = glm::scale(localModel, escala); // finalmente escala
 
-	// 2. Activar y enlazar la textura
+	// 2. Combinarla con la transformación del PADRE
+	// multiplicamos la matriz del padre por la matriz local
+	glm::mat4 finalModel = parentModel * localModel;
+
+	// 3. Enviar el resultado final al shader
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(finalModel));
+
+	// --- El resto de tu función es igual ---
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texturaID);
 	glActiveTexture(GL_TEXTURE1);
@@ -439,6 +458,79 @@ void cuboDraw(glm::mat4 modelo, glm::vec3 escala, glm::vec3 traslado, GLint unif
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+}
+
+/*
+ * Dibuja un conjunto de mesa y bancas estilo centro comercial.
+ * Consta de una barra central (mesa) y dos barras laterales (asientos).
+ * Centrado en (0,0,0).
+*/
+void dibujarBancaCentroComercial(glm::mat4 parentModel, GLint modelLoc, GLuint VAO_Cubo, GLuint texturaID)
+{
+	// --- Dimensiones Generales ---
+	float largoTotal = 3.0f;  // Largo de la mesa y bancas (Eje X)
+	float anchoMesa = 0.8f;   // Ancho de la barra central (Eje Z)
+	float anchoBanca = 0.4f;  // Ancho de los asientos (Eje Z)
+
+	// --- Alturas (Eje Y) ---
+	// Asumimos que el suelo está en algún lugar abajo.
+	// Definimos las alturas relativas al centro del objeto.
+	float alturaMesa = 1.0f;    // Altura de la superficie de la mesa
+	float alturaAsiento = 0.5f; // Altura de la superficie del asiento
+
+	float grosorTabla = 0.1f;   // Grosor de las superficies
+	float grosorPatas = 0.15f;  // Grosor de los soportes
+
+	// =========================================================
+	// 1. MESA CENTRAL
+	// =========================================================
+
+	// Superficie de la Mesa (Centrada en Y = alturaMesa)
+	cuboDraw(parentModel, glm::vec3(largoTotal, grosorTabla, anchoMesa),
+		glm::vec3(0.0f, alturaMesa, 0.0f),
+		modelLoc, VAO_Cubo, texturaID, 0.0f);
+
+	// Soporte Central de la Mesa (Pilar grueso en medio)
+	// Altura del soporte = alturaMesa - (grosorTabla/2) - (ajuste base)
+	// Lo haremos llegar hasta Y=0 (suelo relativo)
+	float altoSoporteMesa = alturaMesa - (grosorTabla / 2.0f);
+	cuboDraw(parentModel, glm::vec3(largoTotal * 0.8f, altoSoporteMesa, grosorPatas),
+		glm::vec3(0.0f, altoSoporteMesa / 2.0f, 0.0f),
+		modelLoc, VAO_Cubo, texturaID, 0.0f);
+
+
+	// =========================================================
+	// 2. BANCAS LATERALES
+	// =========================================================
+
+	// Distancia de separación desde el centro
+	float separacion = (anchoMesa / 2.0f) + (anchoBanca / 2.0f) + 0.1f;
+
+	// --- Banca Trasera (-Z) ---
+
+	// Superficie del Asiento
+	cuboDraw(parentModel, glm::vec3(largoTotal, grosorTabla, anchoBanca),
+		glm::vec3(0.0f, alturaAsiento, -separacion),
+		modelLoc, VAO_Cubo, texturaID, 0.0f);
+
+	// Soporte Banca Trasera
+	float altoSoporteBanca = alturaAsiento - (grosorTabla / 2.0f);
+	cuboDraw(parentModel, glm::vec3(largoTotal * 0.8f, altoSoporteBanca, grosorPatas),
+		glm::vec3(0.0f, altoSoporteBanca / 2.0f, -separacion),
+		modelLoc, VAO_Cubo, texturaID, 0.0f);
+
+
+	// --- Banca Delantera (+Z) ---
+
+	// Superficie del Asiento
+	cuboDraw(parentModel, glm::vec3(largoTotal, grosorTabla, anchoBanca),
+		glm::vec3(0.0f, alturaAsiento, separacion),
+		modelLoc, VAO_Cubo, texturaID, 0.0f);
+
+	// Soporte Banca Delantera
+	cuboDraw(parentModel, glm::vec3(largoTotal * 0.8f, altoSoporteBanca, grosorPatas),
+		glm::vec3(0.0f, altoSoporteBanca / 2.0f, separacion),
+		modelLoc, VAO_Cubo, texturaID, 0.0f);
 }
 
 
@@ -592,6 +684,9 @@ int main()
 	ModelAnim animacionVenado((char*)"Models/venado/venado.fbx");
 	animacionVenado.initShaders(animShader.Program);
 
+	ModelAnim animacionPanda2((char*)"Models/panda/panda/panda.fbx");
+	animacionPanda2.initShaders(animShader.Program);
+
 
 	std::cout << "Modelos cargados habitat pandas!" << std::endl;
 
@@ -733,6 +828,7 @@ int main()
 
 	Model BancaModel((char*)"Models/adornos/banca.obj");
 	Model PuestoModel((char*)"Models/puesto/puesto/puesto.obj");
+	Model mesaSobrillaModel((char*)"Models/mesaSombrilla/mesaSombrilla/mesaSombrilla.obj");
 
 
 	Model Delfin((char*)"Models/delfin.obj");
@@ -754,6 +850,7 @@ int main()
 	GLuint greenTextureID = TextureFromFile("images/textverde.jpg", ".");
 	GLuint amarilloTextureID = TextureFromFile("images/textamarillo.jpg", ".");
 	GLuint cafeTextureID = TextureFromFile("images/cafe.jpg", ".");
+	GLuint grisTextureID = TextureFromFile("images/gris.jpg", ".");
 
 
 	// =================================================================================
@@ -1417,9 +1514,19 @@ int main()
 		modelVenado = glm::translate(modelVenado, venadoPosActual);
 		modelVenado = glm::rotate(modelVenado, glm::radians(rotVenado), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelVenado = glm::scale(modelVenado, glm::vec3(venadoScale));
-
 		animShader.setMat4("model", modelVenado);
 		animacionVenado.Draw(animShader);
+
+		//Panda
+		glm::mat4 Panda1 = glm::mat4(1.0f);
+		Panda1 = glm::translate(Panda1, panda1PosActual);
+		Panda1 = glm::rotate(Panda1, glm::radians(rotPanda1), glm::vec3(0.0f, 1.0f, 0.0f));
+		Panda1 = glm::scale(Panda1, glm::vec3(panda1Scale));
+		animShader.setMat4("model", Panda1);
+		animacionPanda2.Draw(animShader);
+
+
+
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE CAMELLO
@@ -1436,9 +1543,9 @@ int main()
 		// ========== VOLVER AL SHADER DE ILUMINACIÓN esto se deja hasta el final siempre ==========
 		lightingShader.Use();
 
-		// =================================================================================
-		// 							DIBUJO DE MODELOS - BANCAS
-		// =================================================================================
+		 //=================================================================================
+		 			//				DIBUJO DE MODELOS - BANCAS
+		 //=================================================================================
 
 
 		// --- Banca 2 (Camino Izquierdoo) ---
@@ -1481,6 +1588,46 @@ int main()
 		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		PuestoModel.Draw(lightingShader);
+
+		// --- Silla sobrilla 1---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-10.5f, 0.7f, -25.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesaSobrillaModel.Draw(lightingShader);
+
+		// --- Silla sobrilla2 ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-10.5f, 0.7f, -20.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesaSobrillaModel.Draw(lightingShader);
+
+		// --- Silla sobrilla 3---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-7.5f, 0.7f, -25.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesaSobrillaModel.Draw(lightingShader);
+
+		// --- Silla sobrilla4 ---
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-7.5f, 0.7f, -20.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesaSobrillaModel.Draw(lightingShader);
+
+		// --- ÁRBOL ---
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0.0f, -0.5f, -22.5f));
+		model = glm::scale(model, arbolSelvaScale);
+		model = glm::rotate(model, glm::radians(arbolSelvaRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ArbolSelva.Draw(lightingShader);
 
 		// ---------------------------------------------------------------------------------
 		// 							DIBUJO DE ESCENARIO HABITAT PANDAS
@@ -1792,7 +1939,7 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 
 		// =================================================================================
-	// 							ANIMACI�N DE ANIMALES - AVIARIO (CENTRO)
+	// 							ANIMACION DE ANIMALES - AVIARIO (CENTRO)
 	// =================================================================================
 
 	// Hacemos que el ave aletee y mueva la cabeza
@@ -1806,11 +1953,11 @@ int main()
 		// Movimiento de cabeza (m�s lento)
 		rotCabeza = sin(t_aves * 1.5f) * 5.0f; // Gira 15 grados a los lados
 
-		// =================================================================================
-// 							ANIMACIÓN VENADO (Patrulla Lineal Continua)
-// =================================================================================
+		 //=================================================================================
+ 		//					ANIMACIÓN VENADO (Patrulla Lineal Continua)
+ //=================================================================================
 
-// Usamos el tiempo global para un bucle infinito automático
+ //Usamos el tiempo global para un bucle infinito automático
 		float t_venado = glfwGetTime();
 
 		// --- Configuración del recorrido ---
@@ -1869,6 +2016,96 @@ int main()
 
 			// Gira de 90 a -90  para cerrar el ciclo suavemente
 			rotVenado = glm::mix(90.0f, -90.0f, phase);
+		}
+		// =================================================================================
+		// 							ANIMACIÓN PANDA 1 (Cuadrado Corto)
+		// =================================================================================
+		if (animarPanda1FBX)
+		{
+			float t = glfwGetTime() - startTimePanda1FBX;
+
+			// --- Configuración del recorrido ---
+			float dist = 5.0f;        // <-- CAMBIO: Distancia reducida a la mitad (antes 10.0f)
+			float timeWalk = 2.0f;    // <-- CAMBIO: Tiempo reducido a la mitad para mantener velocidad (antes 4.0f)
+			float timeTurn = 1.0f;    // Tiempo girando (igual)
+
+			// Ciclo total: 4 caminatas + 4 giros
+			float totalLoopTime = (timeWalk + timeTurn) * 4.0f;
+			float t_loop = fmod(t, totalLoopTime);
+
+			// --- Calcular frame de animación FBX (Caminar) ---
+			float frameActual = fmod(t * PANDA1_FPS, (float)PANDA1_FRAME_WALK_END);
+
+			// --- Máquina de Estados del Recorrido ---
+
+			// 1. CAMINAR HACIA +Z
+			if (t_loop < timeWalk)
+			{
+				float phase = t_loop / timeWalk;
+				panda1PosActual.x = panda1Pos.x;
+				panda1PosActual.z = glm::mix(panda1Pos.z, panda1Pos.z + dist, phase);
+				rotPanda1 = 270.0f; // Mirando a +Z
+			}
+			// 2. GIRAR HACIA -X
+			else if (t_loop < timeWalk + timeTurn)
+			{
+				float phase = (t_loop - timeWalk) / timeTurn;
+				panda1PosActual.z = panda1Pos.z + dist; // Mantiene posición final
+				rotPanda1 = glm::mix(270.0f, 180.0f, phase); // Gira de 270 a 180
+			}
+			// 3. CAMINAR HACIA -X
+			else if (t_loop < (timeWalk * 2) + timeTurn)
+			{
+				float phase = (t_loop - (timeWalk + timeTurn)) / timeWalk;
+				panda1PosActual.x = glm::mix(panda1Pos.x, panda1Pos.x - dist, phase);
+				panda1PosActual.z = panda1Pos.z + dist;
+				rotPanda1 = 180.0f; // Mirando a -X
+			}
+			// 4. GIRAR HACIA -Z
+			else if (t_loop < (timeWalk * 2) + (timeTurn * 2))
+			{
+				float phase = (t_loop - ((timeWalk * 2) + timeTurn)) / timeTurn;
+				panda1PosActual.x = panda1Pos.x - dist;
+				rotPanda1 = glm::mix(180.0f, 90.0f, phase); // Gira de 180 a 90
+			}
+			// 5. CAMINAR HACIA -Z (Regresando en Z)
+			else if (t_loop < (timeWalk * 3) + (timeTurn * 2))
+			{
+				float phase = (t_loop - ((timeWalk * 2) + (timeTurn * 2))) / timeWalk;
+				panda1PosActual.x = panda1Pos.x - dist;
+				panda1PosActual.z = glm::mix(panda1Pos.z + dist, panda1Pos.z, phase);
+				rotPanda1 = 90.0f; // Mirando a -Z
+			}
+			// 6. GIRAR HACIA +X
+			else if (t_loop < (timeWalk * 3) + (timeTurn * 3))
+			{
+				float phase = (t_loop - ((timeWalk * 3) + (timeTurn * 2))) / timeTurn;
+				panda1PosActual.z = panda1Pos.z;
+				rotPanda1 = glm::mix(90.0f, 0.0f, phase); // Gira de 90 a 0
+			}
+			// 7. CAMINAR HACIA +X (Regresando al origen)
+			else if (t_loop < (timeWalk * 4) + (timeTurn * 3))
+			{
+				float phase = (t_loop - ((timeWalk * 3) + (timeTurn * 3))) / timeWalk;
+				panda1PosActual.x = glm::mix(panda1Pos.x - dist, panda1Pos.x, phase);
+				panda1PosActual.z = panda1Pos.z;
+				rotPanda1 = 0.0f; // Mirando a +X
+			}
+			// 8. GIRAR HACIA +Z (Vuelta final para reiniciar ciclo)
+			else
+			{
+				float phase = (t_loop - ((timeWalk * 4) + (timeTurn * 3))) / timeTurn;
+				panda1PosActual.x = panda1Pos.x;
+				rotPanda1 = glm::mix(0.0f, -90.0f, phase); // Gira de 0 a -90
+			}
+
+			// (Opcional) Pasar datos al shader de animación si tu clase lo requiere
+			// animShader.setFloat("time", t); 
+		}
+		else
+		{
+			panda1PosActual = panda1Pos;
+			rotPanda1 = 270.0f;
 		}
 
 		// ---------------------------------------------------------------------------------
@@ -3364,6 +3601,32 @@ int main()
 
 
 		lightingShader.Use(); // shader de iluminación 
+
+		//-----------------------------------------------------------------
+		//------MODELOS HECHOS EN OPENGL:  --------
+
+
+		// --- Bancas de Centro Comercial (Fila) ---
+		// Creamos 5 bancas separadas por 4 unidades en el eje X
+		for (int i = 0; i < 7; i++)
+		{
+			glm::mat4 modeloBanca = glm::mat4(1.0f);
+
+			// 1. Traslación:
+			// X: Empieza en -3.0 y suma 4.0 por cada iteración (i * 4.0)
+			// Y: Bajamos a -0.6f (estaba en -0.09f)
+			// Z: Se mantiene en -30.0f
+			modeloBanca = glm::translate(modeloBanca, glm::vec3(-7.0f + (i * 3.0f), -0.5f, -30.0f));
+
+			// 2. Rotación: 90 grados en Y
+			modeloBanca = glm::rotate(modeloBanca, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+			// 3. Escala: Más pequeña (0.7 en lugar de 1.0)
+			modeloBanca = glm::scale(modeloBanca, glm::vec3(0.8f, 0.8f, 0.8f));
+
+			// Dibujar
+			dibujarBancaCentroComercial(modeloBanca, modelLoc, VAO_Cubo, grisTextureID);
+		};
 		
 
 		// ========================================================================
@@ -3692,45 +3955,37 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	// Activa la animación del pinguino con la tecla 'C'
 	if (key == GLFW_KEY_C && action == GLFW_PRESS && !teclaC_presionada)
 	{
-		animarPinguino = true;
+		animarPinguino = !animarPinguino;
 		startTimePinguino = glfwGetTime(); // Guarda el tiempo de inicio
 		teclaC_presionada = true; // Evita que se reinicie si se deja presionada
 	}
-	// Opcional: Detener animación con 'V'
-	if (key == GLFW_KEY_V && action == GLFW_PRESS)
-	{
-		animarPinguino = false;
-		teclaC_presionada = false; // Permite volver a iniciar
-		PinAlaIzq = 0.0f; // Resetea posición
-		PinAlaDer = 0.0f; // Resetea posición
+
+	else {
+		teclaC_presionada = false;
 	}
 
 
 	if (key == GLFW_KEY_B && action == GLFW_PRESS && !teclaB_presionada)
 	{
-		animarFoca = true;
+		animarFoca = !animarFoca;
 		startTimeFoca = glfwGetTime(); // Guarda el tiempo de inicio
 		teclaB_presionada = true; // Evita que se reinicie si se deja presionada
 	}
-	if (key == GLFW_KEY_N && action == GLFW_PRESS)
-	{
-		animarFoca = false;
-		teclaB_presionada = false; // Permite volver a iniciar
+	else {
+		teclaB_presionada = false;
 	}
 
 	// Activa la animación del Delfin con la tecla 'X'
 	if (key == GLFW_KEY_X && action == GLFW_PRESS && !teclaD_presionada)
 	{
-		animarDelfin = true;
+		animarDelfin = !animarDelfin;
 		startTimeDelfin = glfwGetTime(); // Guarda el tiempo de inicio
 		teclaD_presionada = true; // Evita que se reinicie si se deja presionada
 	}
-	// Opcional: Detener animación con 'Z'
-	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-	{
-		animarDelfin = false;
-		teclaD_presionada = false; // Permite volver a iniciar
+	else {
+		teclaD_presionada = false;
 	}
+
 
 }
 
