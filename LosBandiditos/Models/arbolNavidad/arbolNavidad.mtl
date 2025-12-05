@@ -1,0 +1,13 @@
+# Blender 4.5.2 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl tripo_mat_cdca507c-a126-43d7-80ca-7f29fc204ceb
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd christmastree3dmodel_basecolor.JPEG
+map_Ns christmastree3dmodel_roughness.JPEG
+map_refl christmastree3dmodel_metallic.JPEG
